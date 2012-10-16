@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.eclipse.amp.javamodel
+Bundle-SymbolicName: ru.agentlab.javamodel
+Bundle-Version: 0.9.0.v20110610-0008
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.ascape.model,
+ org.ascape.model.space,
+ org.ascape.view.vis
+Require-Bundle: org.ascape.core
+

@@ -1,0 +1,5 @@
+"Test that no disease transmission occurs with contact transmission set to 0."
+tests "|params/EpiZeroTransmission.apar"
+Count(Individual.Status=Dead) = [0,5]
+Count(Individual.Status=Exposed) = [0,10]
+Count(Individual.Status=SymptomInfectious)=[0,0]

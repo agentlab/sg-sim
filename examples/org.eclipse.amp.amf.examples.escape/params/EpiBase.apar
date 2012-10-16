@@ -1,0 +1,2 @@
+model "|Epidemic.metaabm"
+StopPeriod=500

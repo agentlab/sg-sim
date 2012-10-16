@@ -1,0 +1,281 @@
+		<HTML>
+			<HEAD>
+				<TITLE>Demographic Prisoner_s Dilemma</TITLE>
+				<STYLE TYPE="text/css">
+					body,
+					html {
+    					margin:0;
+    					padding:0;
+    					
+    					color:#000;
+    				}
+    				body {
+    					min-width:750px;
+    				}
+					#wrap {
+    					
+    					margin:0 auto;
+    					width:1024px;
+    				}
+    				#header {
+    					border-bottom: solid 1px #BEBFAA;   						
+    					left: 220px;
+    				}
+					#nav {
+    					
+    				}
+					#nav ul{
+   						margin:0;
+    					padding:0;
+    					list-style:none;
+    				}
+					#nav li{
+    					display:inline;
+    					margin:0;
+    					padding:0;
+    				}
+    				#main {
+    					border-left: solid 1px #BEBFAA;   						
+    					
+    					float:left;
+    					width:800px;
+    				}
+					#sidebarfake {
+      					float:left;
+    					width:200px;
+    				}
+					#sidebar {
+  						position: fixed;
+      					float:left;
+    					width:200px;
+    				}
+					#footer {
+    					border-top: solid 1px #BEBFAA;   						
+    					
+    					clear:both;
+    				}
+    				
+					#section {
+  						background: #FFFFDC;
+   						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+					#section h1 {
+   						text-align: left;
+   						font-family: sans-serif;
+					}
+					#section p {
+   						text-indent: 2em;
+					}
+					#section p.noindent {
+   						text-indent: 0;
+					}
+					
+					#agent {
+  						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+
+					#agents {
+						border-bottom: solid 1px black;
+						border-left: solid 1px #BEBFAA;
+						border-right: solid 1px black;
+						border-top: solid 1px #BEBFAA;
+						margin: 2em 1em 1em 2em;
+						padding: 0.5em 2em 2em 2em;
+						text-align: justify;
+					}
+				</STYLE>
+			</HEAD>
+			<BODY>
+			<div id="wrap">
+    			<div id="header">
+    				<H1>Demographic Prisoner_s Dilemma</H1>
+					<P></P>
+    			</div>
+    			<div id="sidebarfake">
+    				<H1>   </H1>
+    			</div>
+    			<div id="sidebar">
+			    <ul>
+    					<li><a href="#parlink">Parameters</a></li>
+    					<li><a href="#behaviorlink">Behaviors</a></li>
+    					<li><a href="#agentslink">Agents</a>
+    					<ul>
+    					<li><a href="#playerlink">Player</a></li>
+    					<li><a href="#playCelllink">Play Cell</a></li>
+    					</ul></li>
+    					<li><a href="#projlink">Projections</a></li>
+    				</ul>    				
+    			</div>
+    			<div id="main">
+    					<div id="agent">
+
+    					<h3><a name="parlink">Parameters</a></h3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Player Count</td>
+						<td>Integer</td>
+						<td>100</td></tr>
+					<tr><td colspan="3"><i>The number of players to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Minimum Wealth</td>
+						<td>Integer</td>
+						<td>20</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Maximum Wealth</td>
+						<td>Integer</td>
+						<td>100</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Maximum Age</td>
+						<td>Integer</td>
+						<td>100</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Payoff Cooperate Cooperate</td>
+						<td>Integer</td>
+						<td>2</td></tr>
+					<tr><td colspan="3"><i>The change in wealth for a player when playing cooperate against cooperate.</i></td></tr></tbody>
+					<tbody ><tr><td>Payoff Cooperate Defect</td>
+						<td>Integer</td>
+						<td>-6</td></tr>
+					<tr><td colspan="3"><i>The change in wealth for a player when playing cooperate against defect.</i></td></tr></tbody>
+					<tbody ><tr><td>Payoff Defect Cooperate</td>
+						<td>Integer</td>
+						<td>6</td></tr>
+					<tr><td colspan="3"><i>The change in wealth for a player when playing defect against cooperate.</i></td></tr></tbody>
+					<tbody ><tr><td>Payoff Defect Defect</td>
+						<td>Integer</td>
+						<td>-5</td></tr>
+					<tr><td colspan="3"><i>The change in wealth for a player when both players defect.</i></td></tr></tbody>
+					<tbody ><tr><td>Fission Wealth</td>
+						<td>Integer</td>
+						<td>11</td></tr>
+					<tr><td colspan="3"><i>The wealth level at which an agent can fission.</i></td></tr></tbody>
+					<tbody ><tr><td>Inheirited Wealth</td>
+						<td>Integer</td>
+						<td>6</td></tr>
+					<tr><td colspan="3"><i>The wealth that is passed from parent to child.</i></td></tr></tbody>
+					<tbody ><tr><td>Initial Wealth</td>
+						<td>Integer</td>
+						<td>6</td></tr>
+					<tr><td colspan="3"><i>The wealth initially assigned to an agent at the beginning of model run.</i></td></tr></tbody>
+					<tbody ><tr><td>Mutation Rate</td>
+						<td>Real</td>
+						<td>.1</td></tr>
+					<tr><td colspan="3"><i>The probabaility that a given agent will change strategies in a given period, expressed as a value from 0.0 to 1.0.</i></td></tr></tbody>
+					<tbody ><tr><td>Death Age</td>
+						<td>Integer</td>
+						<td>100</td></tr>
+					<tr><td colspan="3"><i>The number of periods before an agent will be removed from game when Die At Age rule is active.</i></td></tr></tbody>
+					<tbody ><tr><td>Birth Age</td>
+						<td>Integer</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i>The actual age in years as determined by data set.</i></td></tr></tbody>
+		</table>
+    					<h3><a name="behaviorlink">Behaviors</a></h3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Build Demographic Prisonner's Dillema</i></td>
+						<td>Build the Demographic Prisoner_s Dilemma.</td>
+					</tr>
+		</table>
+						</div>
+    					<div id="agents">
+    					<h1><a name="agentslink">Agents</a></h1>
+								<div id="agent">
+									<H2><a name="playerlink"/>Player</a></H2>
+									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Cooperate</td>
+						<td>Boolean</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Age</td>
+						<td>Integer</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Wealth</td>
+						<td>Integer</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Initialize</i></td>
+						<td>Initialize Initialization. Executed once at the beginning of each model run.</td>
+					</tr>
+					<tr>
+						<td><i>Move To Random Location</i></td>
+						<td>Move To Random Location Initialization. Executed once at the beginning of each model run.</td>
+					</tr>
+					<tr>
+						<td><i>Random Walk</i></td>
+						<td>Random Walk Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Play Neighbor</i></td>
+						<td>Play Neighbor Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Update Age</i></td>
+						<td>Update Age Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Fission Rule</i></td>
+						<td>Fission Rule Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Die At Age</i></td>
+						<td>Die At Age Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Die At Wealth 0</i></td>
+						<td>Die At Wealth 0 Rule. Executed every period.</td>
+					</tr>
+		</table>
+								</div>
+								<div id="agent">
+									<H2><a name="playCelllink"/>Play Cell</a></H2>
+									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+		</table>
+								</div>
+						</div>
+					<div id="section">
+						<H2><a name="projlink"/>Projections:</a></H2>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Name</th><th>Description</th><th>Type</th></tr></thead>
+					<tr>
+						<td><i>Game Space</i></td>
+						<td></td>
+						<td>2-Dimensional Grid</td>
+					</tr>
+		</table>
+					</div>			    			
+    			</div>
+			    
+    			<div id="footer">
+					<P>Generated by AMF.</P>
+    			</div>
+			</div>
+			</BODY>
+		</HTML>
+	

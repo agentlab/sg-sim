@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metaabm:SContext xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:act="http://metaabm.org/act" xmlns:function="http://metaabm.org/function" xmlns:metaabm="http://metaabm.org/structure" label="Markets" ID="markets" pluralLabel="Marketss" description="">
+  <attributes label="Trader Count" ID="traderCount" pluralLabel="Trader Counts" description="The number of traders to create." defaultValue="10"/>
+  <attributes label="Firm Count" ID="firmCount" pluralLabel="Firm Counts" description="The number of firms to create." defaultValue="5"/>
+  <attributes label="Initial Firm Value Minimum" ID="initialFirmValueMinimum" pluralLabel="Initial Firm Value Minimums" sType="REAL" defaultValue="100000"/>
+  <attributes label="Initial Firm Value Maximum" ID="initialFirmValueMaximum" pluralLabel="Initial Firm Value Maximums" sType="REAL" defaultValue="1000000"/>
+  <attributes label="Earning Movement Factor Minimum" ID="earningMovementFactorMinimum" pluralLabel="Earning Movement Factor Minimums" sType="REAL" defaultValue=".99"/>
+  <attributes label="Earning Movement Factor Maximum" ID="earningMovementFactorMaximum" pluralLabel="Earning Movement Factor Maximums" sType="REAL" defaultValue="1.01"/>
+  <attributes label="Firm Shares per Instrument" ID="firmSharesperInstrument" pluralLabel="Firm Shares per Instruments" defaultValue="1000"/>
+  <attributes label="Share Price Adjustment Minimum" ID="sharePriceAdjustmentMinimum" pluralLabel="Share Price Adjustment Minimums" sType="REAL" defaultValue=".98"/>
+  <attributes label="Share Price Adjustment Maximum" ID="sharePriceAdjustmentMaximum" pluralLabel="Share Price Adjustment Maximums" sType="REAL" defaultValue="1.02"/>
+  <attributes label="Initial Firm Price Minimum" ID="initialFirmPriceMinimum" pluralLabel="Initial Firm Price Minimums" sType="REAL" defaultValue="10.0"/>
+  <attributes label="Initial Firm Price Maximum" ID="initialFirmPriceMaximum" pluralLabel="Initial Firm Price Maximums" sType="REAL" defaultValue="30.0"/>
+  <attributes label="Initial Trader Funds Minimum" ID="initialTraderFundsMinimum" pluralLabel="Initial Trader Funds Minimums" sType="REAL" defaultValue="50000"/>
+  <attributes label="Initial Trader Funds Maximum" ID="initialTraderFundsMaximum" pluralLabel="Initial Trader Funds Maximums" sType="REAL" defaultValue="50000"/>
+  <attributes label="Firm Shares Count" ID="firmSharesCount" pluralLabel="Firm Shares Counts" defaultValue="10000"/>
+  <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+    <members xsi:type="act:ABuild" label="Build Trading" ID="buildTrading" targets="//@rootActivity/@members[ID='createTraders'] //@rootActivity/@members[ID='createFirms'] //@rootActivity/@members[ID='buildInstrumentHolder'] //@rootActivity/@members[ID='buildFirmInstruments'] //@rootActivity/@members[ID='buildBidFirmss']" selected="//@rootActivity/@members[ID='buildTrading']" agent="/" pluralLabel="Build Tradings"/>
+    <members xsi:type="act:ACreateAgents" label="Create Traders" ID="createTraders" sources="//@rootActivity/@members[ID='buildTrading']" selected="//@rootActivity/@members[ID='buildTrading']" agent="//@agents[ID='trader']" agentCount="//@attributes[ID='traderCount']"/>
+    <members xsi:type="act:ACreateAgents" label="Create Firms" ID="createFirms" sources="//@rootActivity/@members[ID='buildTrading']" selected="//@rootActivity/@members[ID='buildTrading']" agent="//@agents[ID='firm']" agentCount="//@attributes[ID='firmCount']"/>
+    <members xsi:type="act:ABuildNetwork" label="Build Instrument Holder" ID="buildInstrumentHolder" sources="//@rootActivity/@members[ID='buildTrading']" selected="//@rootActivity/@members[ID='buildTrading']" pluralLabel="Build Instrument Holders" agents="//@agents[ID='instrument'] //@agents[ID='trader']" projection="//@projections[ID='instrumentHolders']"/>
+    <members xsi:type="act:ABuildNetwork" label="Build Firm Instruments" ID="buildFirmInstruments" sources="//@rootActivity/@members[ID='buildTrading']" selected="//@rootActivity/@members[ID='buildTrading']" pluralLabel="Build Firm Instrumentss" agents="//@agents[ID='firm'] //@agents[ID='instrument']" projection="//@projections[ID='firmInstruments']"/>
+    <members xsi:type="act:ABuildNetwork" label="Build Bid Firmss" ID="buildBidFirmss" sources="//@rootActivity/@members[ID='buildTrading']" selected="//@rootActivity/@members[ID='buildTrading']" pluralLabel="Build Bid Firmsss" agents="//@agents[ID='trader'] //@agents[ID='firm']" projection="//@projections[ID='targetBuyFirms']"/>
+  </rootActivity>
+  <implementation package="name.milesparker.markets" className="Markets" basePath=""/>
+  <agents label="Trader" ID="trader" pluralLabel="Traders">
+    <attributes xsi:type="metaabm:SState" label="Strategy" ID="strategy" pluralLabel="Strategys" sType="SYMBOL" defaultValue="Random" defaultOption="//@agents[ID='trader']/@attributes[ID='strategy']/@options.2">
+      <options label="Value" ID="value" pluralLabel="Values"/>
+      <options label="Momentum" ID="momentum" pluralLabel="Momentums"/>
+      <options label="Random" ID="random" pluralLabel="Randoms"/>
+    </attributes>
+    <attributes label="Funds" ID="funds" pluralLabel="Fundss" sType="REAL" gatherData="true" defaultValue="100000"/>
+    <attributes label="Instrument Count" ID="instrumentCount" pluralLabel="Instrument Counts" gatherData="true"/>
+    <rootActivity xsi:type="act:AGroup" label="Execute Buy" ID="executeBuy" pluralLabel="Execute Buys">
+      <members xsi:type="act:AInitialize" label="Initialize" ID="initialize" targets="//@agents[ID='trader']/@rootActivity/@members[ID='randomState_Strategy_'] //@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='trader']" pluralLabel="Initializes"/>
+      <members xsi:type="act:AEvaluate" label="Random State(Strategy)" ID="randomState_Strategy_" sources="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setStrategyToRandomState_Strategy_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='trader']/@attributes[ID='strategy']"/>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='random']/@functions[ID='randomState']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Strategy To Random State(Strategy)" ID="setStrategyToRandomState_Strategy_" sources="//@agents[ID='trader']/@rootActivity/@members[ID='randomState_Strategy_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" attribute="//@agents[ID='trader']/@attributes[ID='strategy']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='randomState_Strategy_']"/>
+      <members xsi:type="act:ARule" label="Ask" ID="ask" targets="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" agent="//@agents[ID='trader']" pluralLabel="Asks" description=""/>
+      <members xsi:type="act:ASelect" label="Selling" ID="selling" sources="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='statusIdenticalHeldQuery']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" agent="//@agents[ID='instrument']" space="//@projections[ID='instrumentHolders']"/>
+      <members xsi:type="act:ARule" label="Buy" ID="buy" targets="//@agents[ID='trader']/@rootActivity/@members[ID='disconnectCopy']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" agent="//@agents[ID='trader']" pluralLabel="Buys"/>
+      <members xsi:type="act:ASelect" label="Bought Instrument" ID="boughtInstrument" sources="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopyCopy']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='statusIdenticalOfferredQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='totalPriceLesserorEqualFundsQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopyCopyCopy']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='firm']" agent="//@agents[ID='instrument']" space="//@projections[ID='firmInstruments']"/>
+      <members xsi:type="act:AQuery" label="Status Identical Offerred Query" ID="statusIdenticalOfferredQuery" sources="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='_Minimize_FirmPriceEarningsRatio_QueryAndStrategyIdenticalValueQueryAndTotalPriceLesserorEqualFundsQueryAndStatusIdenticalOfferredQuery_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='status']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='status']/@options.0"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='identical']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Neighbor() Query" ID="neighborQuery" sources="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='_NeighborQueryAndStatusIdenticalHeldQueryAndQuery_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Status To Offerred" ID="setStatusToOfferred" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setOfferPriceToNewSharePrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" attribute="//@agents[ID='instrument']/@attributes[ID='status']" parameter="//@agents[ID='instrument']/@attributes[ID='status']/@options.0"/>
+      <members xsi:type="act:ASet" label="Set Status To Held" ID="setStatusToHeld" sources="//@agents[ID='trader']/@rootActivity/@members[ID='_Minimize_FirmPriceEarningsRatio_QueryAndStrategyIdenticalValueQueryAndTotalPriceLesserorEqualFundsQueryAndStatusIdenticalOfferredQuery_']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='fundsSubtractTotalPrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" attribute="//@agents[ID='instrument']/@attributes[ID='status']" parameter="//@agents[ID='instrument']/@attributes[ID='status']/@options.1"/>
+      <members xsi:type="act:ASelect" label="Instrument Firm" ID="instrumentFirm" sources="//@agents[ID='trader']/@rootActivity/@members[ID='_NeighborQueryAndStatusIdenticalHeldQueryAndQuery_']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='neighborFirm']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" agent="//@agents[ID='firm']" space="//@projections[ID='firmInstruments']"/>
+      <members xsi:type="act:AQuery" label="Neighbor Firm" ID="neighborFirm" sources="//@agents[ID='trader']/@rootActivity/@members[ID='instrumentFirm']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='instrumentFirm']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Share Price Adjustment" ID="sharePriceAdjustment" sources="//@agents[ID='trader']/@rootActivity/@members[ID='neighborFirm']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='newSharePrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" value="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Share Price Adjustment States" ID="sharePriceAdjustmentStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" value="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Share Price Adjustment Minimum" ID="sharePriceAdjustmentMinimum" values="//@attributes[ID='sharePriceAdjustmentMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" value="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Share Price Adjustment Maximum" ID="sharePriceAdjustmentMaximum" values="//@attributes[ID='sharePriceAdjustmentMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="New Share Price" ID="newSharePrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setOfferPriceToNewSharePrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='ask']" value="//@agents[ID='trader']/@rootActivity/@members[ID='sharePriceAdjustment']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='instrumentFirm']" value="//@agents[ID='firm']/@attributes[ID='lastPrice']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='mul']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Offer Price To New Share Price" ID="setOfferPriceToNewSharePrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='newSharePrice']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setStatusToOfferred']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" attribute="//@agents[ID='instrument']/@attributes[ID='offerPrice']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='newSharePrice']"/>
+      <members xsi:type="act:AEvaluate" label="Funds Subtract Total Price" ID="fundsSubtractTotalPrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setStatusToHeld']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setFundsToFundsSubtractTotalPrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" value="//@agents[ID='trader']/@attributes[ID='funds']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='totalPrice']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='sub']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Funds To Funds Subtract Total Price" ID="setFundsToFundsSubtractTotalPrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='fundsSubtractTotalPrice']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='offerPriceAddZero']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" attribute="//@agents[ID='trader']/@attributes[ID='funds']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='fundsSubtractTotalPrice']"/>
+      <members xsi:type="act:ASelect" label="Seller" ID="seller" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setLastPriceToOfferPriceAddZero']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopy']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" agent="//@agents[ID='trader']" space="//@projections[ID='instrumentHolders']"/>
+      <members xsi:type="act:AQuery" label="Neighbor() Query Copy" ID="neighborQueryCopy" sources="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='fundsAddTotalPrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Funds Add Total Price" ID="fundsAddTotalPrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopy']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setFundsToFundsAddTotalPrice']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" value="//@agents[ID='trader']/@attributes[ID='funds']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='totalPrice']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='add']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Funds To Funds Add Total Price" ID="setFundsToFundsAddTotalPrice" sources="//@agents[ID='trader']/@rootActivity/@members[ID='fundsAddTotalPrice']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='disconnect']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" attribute="//@agents[ID='trader']/@attributes[ID='funds']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='fundsAddTotalPrice']"/>
+      <members xsi:type="act:ASelect" label="Offered Firm" ID="offeredFirm" sources="//@agents[ID='trader']/@rootActivity/@members[ID='disconnectCopy']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='connectTrader']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" agent="//@agents[ID='firm']"/>
+      <members xsi:type="act:ASet" label="Set Last Price To Offer Price Add Zero" ID="setLastPriceToOfferPriceAddZero" sources="//@agents[ID='trader']/@rootActivity/@members[ID='offerPriceAddZero']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='firm']" attribute="//@agents[ID='firm']/@attributes[ID='lastPrice']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='offerPriceAddZero']"/>
+      <members xsi:type="act:AEvaluate" label="Initial Trader Funds" ID="initialTraderFunds" sources="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setFundsToInitialTraderFunds']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Trader Funds States" ID="initialTraderFundsStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Trader Funds Minimum" ID="initialTraderFundsMinimum" values="//@attributes[ID='initialTraderFundsMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Trader Funds Maximum" ID="initialTraderFundsMaximum" values="//@attributes[ID='initialTraderFundsMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Funds To Initial Trader Funds" ID="setFundsToInitialTraderFunds" sources="//@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='initialize']" attribute="//@agents[ID='trader']/@attributes[ID='funds']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='initialTraderFunds']"/>
+      <members xsi:type="act:ADisconnect" label="Disconnect" ID="disconnect" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setFundsToFundsAddTotalPrice']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='connectInstrument']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" destination="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" within="//@projections[ID='instrumentHolders']"/>
+      <members xsi:type="act:AConnect" label="Connect Instrument" ID="connectInstrument" sources="//@agents[ID='trader']/@rootActivity/@members[ID='disconnect']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='incrementCount']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" destination="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" within="//@projections[ID='instrumentHolders']" directed="false"/>
+      <members xsi:type="act:AQuery" label="Status Identical Held Query" ID="statusIdenticalHeldQuery" sources="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='_NeighborQueryAndStatusIdenticalHeldQueryAndQuery_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" value="//@agents[ID='instrument']/@attributes[ID='status']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']" value="//@agents[ID='instrument']/@attributes[ID='status']/@options.1"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='identical']"/>
+      </members>
+      <members xsi:type="act:AAll" label="(Neighbor() Query &amp; Status Identical Held Query &amp;  Query)" ID="_NeighborQueryAndStatusIdenticalHeldQueryAndQuery_" sources="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='statusIdenticalHeldQuery']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='instrumentFirm']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='selling']"/>
+      <members xsi:type="act:AEvaluate" label="Decrement Seller Count" ID="decrementSellerCount" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setInstrumentCountToIncrementCount']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setSellerInstrumentCountToDecrementSellerCount']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" value="//@agents[ID='trader']/@attributes[ID='instrumentCount']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']">
+          <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='unit']"/>
+        </inputs>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='sub']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Seller Instrument Count To Decrement Seller Count" ID="setSellerInstrumentCountToDecrementSellerCount" sources="//@agents[ID='trader']/@rootActivity/@members[ID='decrementSellerCount']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='seller']" attribute="//@agents[ID='trader']/@attributes[ID='instrumentCount']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='decrementSellerCount']"/>
+      <members xsi:type="act:AEvaluate" label="Increment Count" ID="incrementCount" sources="//@agents[ID='trader']/@rootActivity/@members[ID='connectInstrument']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setInstrumentCountToIncrementCount']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" value="//@agents[ID='trader']/@attributes[ID='instrumentCount']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='increment']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Instrument Count To Increment Count" ID="setInstrumentCountToIncrementCount" sources="//@agents[ID='trader']/@rootActivity/@members[ID='incrementCount']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='decrementSellerCount']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" attribute="//@agents[ID='trader']/@attributes[ID='instrumentCount']" parameter="//@agents[ID='trader']/@rootActivity/@members[ID='incrementCount']"/>
+      <members xsi:type="act:AQuery" label="Total Price Lesser or Equal Funds Query" ID="totalPriceLesserorEqualFundsQuery" sources="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='_Minimize_FirmPriceEarningsRatio_QueryAndStrategyIdenticalValueQueryAndTotalPriceLesserorEqualFundsQueryAndStatusIdenticalOfferredQuery_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='totalPrice']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" value="//@agents[ID='trader']/@attributes[ID='funds']"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='lesserorEqual']"/>
+      </members>
+      <members xsi:type="act:AAll" label="(Minimize(Firm Price Earnings Ratio) Query &amp; Strategy Identical Value Query &amp; Total Price Lesser or Equal Funds Query &amp; Status Identical Offerred Query)" ID="_Minimize_FirmPriceEarningsRatio_QueryAndStrategyIdenticalValueQueryAndTotalPriceLesserorEqualFundsQueryAndStatusIdenticalOfferredQuery_" sources="//@agents[ID='trader']/@rootActivity/@members[ID='totalPriceLesserorEqualFundsQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='statusIdenticalOfferredQuery'] //@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopyCopyCopy']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setStatusToHeld']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']"/>
+      <members xsi:type="act:AConnect" label="Connect Trader" ID="connectTrader" sources="//@agents[ID='trader']/@rootActivity/@members[ID='offeredFirm']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" destination="//@agents[ID='trader']/@rootActivity/@members[ID='offeredFirm']" within="//@projections[ID='targetBuyFirms']" directed="false"/>
+      <members xsi:type="act:ARule" label="Execute" ID="execute" targets="//@agents[ID='trader']/@rootActivity/@members[ID='firm']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" agent="//@agents[ID='trader']" pluralLabel="Executes"/>
+      <members xsi:type="act:ASelect" label="Firm" ID="firm" sources="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='neighborQueryCopyCopy']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']" agent="//@agents[ID='firm']" space="//@projections[ID='targetBuyFirms']"/>
+      <members xsi:type="act:AQuery" label="Neighbor() Query Copy Copy" ID="neighborQueryCopyCopy" sources="//@agents[ID='trader']/@rootActivity/@members[ID='firm']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='firm']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Offer Price Add Zero" ID="offerPriceAddZero" sources="//@agents[ID='trader']/@rootActivity/@members[ID='setFundsToFundsSubtractTotalPrice']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='setLastPriceToOfferPriceAddZero']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']">
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" value="//@agents[ID='instrument']/@attributes[ID='offerPrice']"/>
+        <inputs selected="//@agents[ID='trader']/@rootActivity/@members[ID='execute']">
+          <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='zero']"/>
+        </inputs>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='add']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Neighbor() Query Copy Copy Copy" ID="neighborQueryCopyCopyCopy" sources="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='_Minimize_FirmPriceEarningsRatio_QueryAndStrategyIdenticalValueQueryAndTotalPriceLesserorEqualFundsQueryAndStatusIdenticalOfferredQuery_']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='boughtInstrument']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:ADisconnect" label="Disconnect Copy" ID="disconnectCopy" sources="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" targets="//@agents[ID='trader']/@rootActivity/@members[ID='offeredFirm']" selected="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" destination="//@agents[ID='trader']/@rootActivity/@members[ID='buy']" within="//@projections[ID='targetBuyFirms']"/>
+    </rootActivity>
+    <implementation className="Trader"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Trader Style 2D" ID="traderStyle2D" pluralLabel="Trader Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+        <members xsi:type="act:ARule" label="Trader Rule" ID="traderRule" targets="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='colorBlue']" selected="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='traderRule']" agent="//@agents[ID='trader']" space="//@projections[ID='instrumentHolders']" pluralLabel="Trader Rules"/>
+        <members xsi:type="act:AEvaluate" label="Color Blue()" ID="colorBlue" sources="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='traderRule']" targets="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='traderRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorBlue']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Shape Rectangle()" ID="shapeRectangle" sources="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='colorBlue']" targets="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='graphicFill']" selected="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='traderRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeRectangle']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Graphic Fill()" ID="graphicFill" sources="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='trader']/@styles[ID='traderStyle2D']/@rootActivity/@members[ID='traderRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+      </rootActivity>
+      <implementation className="TraderStyle2D"/>
+    </styles>
+  </agents>
+  <agents label="Firm" ID="firm" pluralLabel="Firms">
+    <attributes label="Shares Outstanding" ID="sharesOutstanding" pluralLabel="Shares Outstandings" gatherData="true" defaultValue="0" units=""/>
+    <attributes label="Last Earnings" ID="lastEarnings" pluralLabel="Last Earningss" sType="REAL" gatherData="true"/>
+    <attributes label="Last Price" ID="lastPrice" pluralLabel="Last Prices" sType="REAL" gatherData="true" defaultValue="1.0"/>
+    <attributes label="Shares Internal" ID="sharesInternal" pluralLabel="Shares Internals" gatherData="true" defaultValue="50000"/>
+    <attributes label="Price Earnings Ratio" ID="priceEarningsRatio" pluralLabel="Price Earnings Ratios" sType="REAL" derived="true"/>
+    <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+      <members xsi:type="act:AInitialize" label="Initialize" ID="initialize" targets="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue'] //@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice'] //@agents[ID='firm']/@rootActivity/@members[ID='setSharesInternalToFirmSharesCount']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='firm']" pluralLabel="Initializes"/>
+      <members xsi:type="act:AEvaluate" label="Initial Firm Value" ID="initialFirmValue" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setLastEarningsToInitialFirmValue']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Value States" ID="initialFirmValueStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Value Minimum" ID="initialFirmValueMinimum" values="//@attributes[ID='initialFirmValueMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Value Maximum" ID="initialFirmValueMaximum" values="//@attributes[ID='initialFirmValueMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Last Earnings To Initial Firm Value" ID="setLastEarningsToInitialFirmValue" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" attribute="//@agents[ID='firm']/@attributes[ID='lastEarnings']" parameter="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmValue']"/>
+      <members xsi:type="act:ARule" label="Modify Earnings" ID="modifyEarnings" targets="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" agent="//@agents[ID='firm']" pluralLabel="Modify Earningss"/>
+      <members xsi:type="act:AEvaluate" label="Earning Movement Factor" ID="earningMovementFactor" sources="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='lastEarningsMultiplyEarningMovementFactor']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" value="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Earning Movement Factor States" ID="earningMovementFactorStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" value="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Earning Movement Factor Minimum" ID="earningMovementFactorMinimum" values="//@attributes[ID='earningMovementFactorMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" value="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Earning Movement Factor Maximum" ID="earningMovementFactorMaximum" values="//@attributes[ID='earningMovementFactorMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Last Earnings Multiply Earning Movement Factor" ID="lastEarningsMultiplyEarningMovementFactor" sources="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setLastEarningsToLastEarningsMultiplyEarningMovementFactor']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" value="//@agents[ID='firm']/@attributes[ID='lastEarnings']"/>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" value="//@agents[ID='firm']/@rootActivity/@members[ID='earningMovementFactor']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='mul']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Last Earnings To Last Earnings Multiply Earning Movement Factor" ID="setLastEarningsToLastEarningsMultiplyEarningMovementFactor" sources="//@agents[ID='firm']/@rootActivity/@members[ID='lastEarningsMultiplyEarningMovementFactor']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='modifyEarnings']" attribute="//@agents[ID='firm']/@attributes[ID='lastEarnings']" parameter="//@agents[ID='firm']/@rootActivity/@members[ID='lastEarningsMultiplyEarningMovementFactor']"/>
+      <members xsi:type="act:AInitialize" label="Offer Shares" ID="offerShares" targets="//@agents[ID='firm']/@rootActivity/@members[ID='sharesInternalGreaterZeroQuery']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" agent="//@agents[ID='firm']" pluralLabel="Offer Sharess"/>
+      <members xsi:type="act:AQuery" label="Shares Internal Greater Zero Query" ID="sharesInternalGreaterZeroQuery" sources="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='sharesInternalSubtractFirmSharesperInstrument']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" value="//@agents[ID='firm']/@attributes[ID='sharesInternal']"/>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']">
+          <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='zero']"/>
+        </inputs>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='greater']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Shares Internal To Shares Internal Subtract Firm Shares per Instrument" ID="setSharesInternalToSharesInternalSubtractFirmSharesperInstrument" sources="//@agents[ID='firm']/@rootActivity/@members[ID='sharesInternalSubtractFirmSharesperInstrument']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" attribute="//@agents[ID='firm']/@attributes[ID='sharesInternal']" parameter="//@agents[ID='firm']/@rootActivity/@members[ID='sharesInternalSubtractFirmSharesperInstrument']"/>
+      <members xsi:type="act:AEvaluate" label="Shares Internal Subtract Firm Shares per Instrument" ID="sharesInternalSubtractFirmSharesperInstrument" sources="//@agents[ID='firm']/@rootActivity/@members[ID='sharesInternalGreaterZeroQuery']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setSharesInternalToSharesInternalSubtractFirmSharesperInstrument']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" value="//@agents[ID='firm']/@attributes[ID='sharesInternal']"/>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" value="//@attributes[ID='firmSharesperInstrument']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='sub']"/>
+      </members>
+      <members xsi:type="act:ACreateAgents" label="Create Instrument" ID="createInstrument" sources="//@agents[ID='firm']/@rootActivity/@members[ID='setSharesInternalToSharesInternalSubtractFirmSharesperInstrument']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setStatusToHeld'] //@agents[ID='firm']/@rootActivity/@members[ID='connectFirmCopy']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" agent="//@agents[ID='instrument']"/>
+      <members xsi:type="act:ACause" label="Cause" ID="cause" sources="//@agents[ID='firm']/@rootActivity/@members[ID='setInstrumentCountToIncrementInstrumentCount']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" result="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']"/>
+      <members xsi:type="act:ASet" label="Set Shares To Firm Shares per Instrument" ID="setSharesToFirmSharesperInstrument" sources="//@agents[ID='firm']/@rootActivity/@members[ID='setOfferPriceToLastPrice']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" attribute="//@agents[ID='instrument']/@attributes[ID='shares']" parameter="//@attributes[ID='firmSharesperInstrument']"/>
+      <members xsi:type="act:ASet" label="Set Status To Held" ID="setStatusToHeld" sources="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setOfferPriceToLastPrice']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" attribute="//@agents[ID='instrument']/@attributes[ID='status']" parameter="//@agents[ID='instrument']/@attributes[ID='status']/@options.1"/>
+      <members xsi:type="act:AConnect" label="Connect Firm Copy" ID="connectFirmCopy" sources="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='offerShares']" destination="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" within="//@projections[ID='firmInstruments']" directed="false"/>
+      <members xsi:type="act:AEvaluate" label="Initial Firm Price" ID="initialFirmPrice" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setLastPriceToInitialFirmPrice']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Price States" ID="initialFirmPriceStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Price Minimum" ID="initialFirmPriceMinimum" values="//@attributes[ID='initialFirmPriceMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" value="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Initial Firm Price Maximum" ID="initialFirmPriceMaximum" values="//@attributes[ID='initialFirmPriceMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Last Price To Initial Firm Price" ID="setLastPriceToInitialFirmPrice" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" attribute="//@agents[ID='firm']/@attributes[ID='lastPrice']" parameter="//@agents[ID='firm']/@rootActivity/@members[ID='initialFirmPrice']"/>
+      <members xsi:type="act:ASet" label="Set Offer Price To Last Price" ID="setOfferPriceToLastPrice" sources="//@agents[ID='firm']/@rootActivity/@members[ID='setStatusToHeld']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setSharesToFirmSharesperInstrument']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" attribute="//@agents[ID='instrument']/@attributes[ID='offerPrice']" parameter="//@agents[ID='firm']/@attributes[ID='lastPrice']"/>
+      <members xsi:type="act:ASelect" label="Initial Trader" ID="initialTrader" sources="//@agents[ID='firm']/@rootActivity/@members[ID='connectFirmCopy']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='connectInstrument']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" agent="//@agents[ID='trader']"/>
+      <members xsi:type="act:AConnect" label="Connect Instrument" ID="connectInstrument" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='incrementInstrumentCount']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']" destination="//@agents[ID='firm']/@rootActivity/@members[ID='createInstrument']" within="//@projections[ID='instrumentHolders']" directed="false"/>
+      <members xsi:type="act:ASet" label="Set Instrument Count To Increment Instrument Count" ID="setInstrumentCountToIncrementInstrumentCount" sources="//@agents[ID='firm']/@rootActivity/@members[ID='incrementInstrumentCount']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='cause']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']" attribute="//@agents[ID='trader']/@attributes[ID='instrumentCount']" parameter="//@agents[ID='firm']/@rootActivity/@members[ID='incrementInstrumentCount']"/>
+      <members xsi:type="act:AEvaluate" label="Increment Instrument Count" ID="incrementInstrumentCount" sources="//@agents[ID='firm']/@rootActivity/@members[ID='connectInstrument']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setInstrumentCountToIncrementInstrumentCount']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialTrader']" value="//@agents[ID='trader']/@attributes[ID='instrumentCount']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='increment']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Shares Internal To Firm Shares Count" ID="setSharesInternalToFirmSharesCount" sources="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='initialize']" attribute="//@agents[ID='firm']/@attributes[ID='sharesInternal']" parameter="//@attributes[ID='firmSharesCount']"/>
+      <members xsi:type="act:ADerive" label="Derive Price Earnings Ratio" ID="derivePriceEarningsRatio" targets="//@agents[ID='firm']/@rootActivity/@members[ID='lastPriceDivideLastEarnings']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='derivePriceEarningsRatio']" attribute="//@agents[ID='firm']/@attributes[ID='priceEarningsRatio']" agent="//@agents[ID='firm']"/>
+      <members xsi:type="act:AEvaluate" label="Last Price Divide Last Earnings" ID="lastPriceDivideLastEarnings" sources="//@agents[ID='firm']/@rootActivity/@members[ID='derivePriceEarningsRatio']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='derivePriceEarningsRatio']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='derivePriceEarningsRatio']" value="//@agents[ID='firm']/@attributes[ID='lastPrice']"/>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='derivePriceEarningsRatio']" value="//@agents[ID='firm']/@attributes[ID='lastEarnings']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='div']"/>
+      </members>
+      <members xsi:type="act:ARule" label="Clear Offers" ID="clearOffers" targets="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='clearOffers']" agent="//@agents[ID='firm']" pluralLabel="Clear Offerss"/>
+      <members xsi:type="act:ASelect" label="Firm" ID="firm" sources="//@agents[ID='firm']/@rootActivity/@members[ID='clearOffers']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='allQuery'] //@agents[ID='firm']/@rootActivity/@members[ID='statusIdenticalAskQuery']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='clearOffers']" agent="//@agents[ID='instrument']"/>
+      <members xsi:type="act:AQuery" label="All() Query" ID="allQuery" sources="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='_FirmAndStatusIdenticalAskQuery_']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='all']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Status Identical Ask Query" ID="statusIdenticalAskQuery" sources="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='_FirmAndStatusIdenticalAskQuery_']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']">
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" value="//@agents[ID='instrument']/@attributes[ID='status']"/>
+        <inputs selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" value="//@agents[ID='instrument']/@attributes[ID='status']/@options.0"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='identical']"/>
+      </members>
+      <members xsi:type="act:AAll" label="(Firm &amp; Status Identical Ask Query)" ID="_FirmAndStatusIdenticalAskQuery_" sources="//@agents[ID='firm']/@rootActivity/@members[ID='statusIdenticalAskQuery'] //@agents[ID='firm']/@rootActivity/@members[ID='allQuery']" targets="//@agents[ID='firm']/@rootActivity/@members[ID='setStatusToHeldCopy']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']"/>
+      <members xsi:type="act:ASet" label="Set Status To Held Copy" ID="setStatusToHeldCopy" sources="//@agents[ID='firm']/@rootActivity/@members[ID='_FirmAndStatusIdenticalAskQuery_']" selected="//@agents[ID='firm']/@rootActivity/@members[ID='firm']" attribute="//@agents[ID='instrument']/@attributes[ID='status']" parameter="//@agents[ID='instrument']/@attributes[ID='status']/@options.1"/>
+    </rootActivity>
+    <implementation className="Firm"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Firm Style 2D" ID="firmStyle2D" pluralLabel="Firm Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+        <members xsi:type="act:ARule" label="Firm Rule" ID="firmRule" targets="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='colorRed']" selected="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='firmRule']" agent="//@agents[ID='firm']" space="//@projections[ID='instrumentHolders']" pluralLabel="Firm Rules"/>
+        <members xsi:type="act:AEvaluate" label="Color Red()" ID="colorRed" sources="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='firmRule']" targets="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='firmRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorRed']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Shape Rectangle()" ID="shapeRectangle" sources="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='colorRed']" targets="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='graphicFill']" selected="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='firmRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeRectangle']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Graphic Fill()" ID="graphicFill" sources="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='firm']/@styles[ID='firmStyle2D']/@rootActivity/@members[ID='firmRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+      </rootActivity>
+      <implementation className="FirmStyle2D"/>
+    </styles>
+  </agents>
+  <agents label="Instrument" ID="instrument" pluralLabel="Instruments">
+    <attributes label="Shares" ID="shares" pluralLabel="Sharess"/>
+    <attributes xsi:type="metaabm:SState" label="Status" ID="status" pluralLabel="Statuss" sType="SYMBOL" gatherData="true" defaultValue="Ask" defaultOption="//@agents[ID='instrument']/@attributes[ID='status']/@options.0">
+      <options label="Ask" ID="ask" pluralLabel="Asks"/>
+      <options label="Held" ID="held" pluralLabel="Helds"/>
+      <options label="Bid" ID="bid" pluralLabel="Bids"/>
+    </attributes>
+    <attributes label="Offer Price" ID="offerPrice" pluralLabel="Offer Prices" sType="REAL" gatherData="true"/>
+    <attributes label="Total Price" ID="totalPrice" pluralLabel="Total Prices" sType="REAL" gatherData="true" derived="true"/>
+    <attributes label="Firm Price Earnings Ratio" ID="firmPriceEarningsRatio" pluralLabel="Offered Price Earning Ratio" sType="REAL" derived="true"/>
+    <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+      <members xsi:type="act:ADerive" label="Derive Total Price" ID="deriveTotalPrice" targets="//@agents[ID='instrument']/@rootActivity/@members[ID='offerPriceMultiplyShares']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveTotalPrice']" attribute="//@agents[ID='instrument']/@attributes[ID='totalPrice']" agent="//@agents[ID='instrument']"/>
+      <members xsi:type="act:AEvaluate" label="Offer Price Multiply Shares" ID="offerPriceMultiplyShares" sources="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveTotalPrice']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveTotalPrice']">
+        <inputs selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveTotalPrice']" value="//@agents[ID='instrument']/@attributes[ID='offerPrice']"/>
+        <inputs selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveTotalPrice']" value="//@agents[ID='instrument']/@attributes[ID='shares']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='mul']"/>
+      </members>
+      <members xsi:type="act:ADerive" label="Derive Firm Price Earnings Ratio" ID="deriveFirmPriceEarningsRatio" targets="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveFirmPriceEarningsRatio']" attribute="//@agents[ID='instrument']/@attributes[ID='firmPriceEarningsRatio']" agent="//@agents[ID='instrument']"/>
+      <members xsi:type="act:ASelect" label="Offerred Firm" ID="offerredFirm" sources="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveFirmPriceEarningsRatio']" targets="//@agents[ID='instrument']/@rootActivity/@members[ID='neighborQuery']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='deriveFirmPriceEarningsRatio']" agent="//@agents[ID='firm']" space="//@projections[ID='firmInstruments']"/>
+      <members xsi:type="act:AQuery" label="Neighbor() Query" ID="neighborQuery" sources="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']" targets="//@agents[ID='instrument']/@rootActivity/@members[ID='_Unspecified_']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Price Earnings Ratio Add Zero" ID="_Unspecified_" sources="//@agents[ID='instrument']/@rootActivity/@members[ID='neighborQuery']" selected="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']">
+        <inputs selected="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']" value="//@agents[ID='firm']/@attributes[ID='priceEarningsRatio']"/>
+        <inputs selected="//@agents[ID='instrument']/@rootActivity/@members[ID='offerredFirm']">
+          <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='zero']"/>
+        </inputs>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='add']"/>
+      </members>
+    </rootActivity>
+    <implementation className="Instrument"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Instrument Style 2D" ID="instrumentStyle2D" pluralLabel="Instrument Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+        <members xsi:type="act:ARule" label="Instrument Rule" ID="instrumentRule" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='statusIdenticalHeldQuery'] //@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='statusIdenticalOfferredQuery']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" agent="//@agents[ID='instrument']" space="//@projections[ID='instrumentHolders']" pluralLabel="Instrument Rules"/>
+        <members xsi:type="act:AEvaluate" label="Color Gray()" ID="colorGray" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='statusIdenticalHeldQuery']" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='shapeOval']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorGray']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Shape Oval()" ID="shapeOval" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='colorGray'] //@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='colorBlack']" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='graphicFill']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeOval']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Graphic Fill()" ID="graphicFill" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='shapeOval']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+        <members xsi:type="act:AQuery" label="Status Identical Held Query" ID="statusIdenticalHeldQuery" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='colorGray']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <inputs selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" value="//@agents[ID='instrument']/@attributes[ID='status']"/>
+          <inputs selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" value="//@agents[ID='instrument']/@attributes[ID='status']/@options.1"/>
+          <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='identical']"/>
+        </members>
+        <members xsi:type="act:AQuery" label="Status Identical Offerred Query" ID="statusIdenticalOfferredQuery" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='colorBlack']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <inputs selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" value="//@agents[ID='instrument']/@attributes[ID='status']"/>
+          <inputs selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']" value="//@agents[ID='instrument']/@attributes[ID='status']/@options.0"/>
+          <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='identical']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Color Black()" ID="colorBlack" sources="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='statusIdenticalOfferredQuery']" targets="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='shapeOval']" selected="//@agents[ID='instrument']/@styles[ID='instrumentStyle2D']/@rootActivity/@members[ID='instrumentRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorBlack']"/>
+        </members>
+      </rootActivity>
+      <implementation className="InstrumentStyle2D"/>
+    </styles>
+  </agents>
+  <projections xsi:type="metaabm:SNetwork" label="InstrumentHolders" ID="instrumentHolders" pluralLabel="InstrumentHolderss"/>
+  <projections xsi:type="metaabm:SNetwork" label="FirmInstruments" ID="firmInstruments" pluralLabel="FirmInstrumentss"/>
+  <projections xsi:type="metaabm:SNetwork" label="Target Buy Firms" ID="targetBuyFirms" pluralLabel="Target Buy Firmss"/>
+</metaabm:SContext>

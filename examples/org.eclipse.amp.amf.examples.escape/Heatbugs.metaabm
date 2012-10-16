@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metaabm:SContext xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:act="http://metaabm.org/act" xmlns:function="http://metaabm.org/function" xmlns:metaabm="http://metaabm.org/structure" label="Heatbugs" ID="heatbugs" pluralLabel="Heatbugss">
+  <attributes label="Heat Bug Count" ID="heatBugCount" pluralLabel="Heat Bug Counts" description="The number of heat bugs to create." defaultValue="100"/>
+  <attributes label="Diffusion Rate" ID="diffusionRate" pluralLabel="Diffusion Rates" sType="REAL" defaultValue="1.0"/>
+  <attributes label="Evaporation Rate" ID="evaporationRate" pluralLabel="Evaporation Rates" sType="REAL" defaultValue=".01"/>
+  <attributes label="Ideal Temperature Draw Minimum" ID="idealTemperatureDrawMinimum" pluralLabel="Ideal Temperature Draw Minimums" sType="REAL" defaultValue="135"/>
+  <attributes label="Ideal Temperature Draw Maximum" ID="idealTemperatureDrawMaximum" pluralLabel="Ideal Temperature Draw Maximums" sType="REAL" defaultValue="240"/>
+  <attributes label="Output Heat Draw Minimum" ID="outputHeatDrawMinimum" pluralLabel="Output Heat Draw Minimums" sType="REAL" defaultValue="23"/>
+  <attributes label="Output Heat Draw Maximum" ID="outputHeatDrawMaximum" pluralLabel="Output Heat Draw Maximums" sType="REAL" defaultValue="76"/>
+  <attributes label="Maximum Heat" ID="maximumHeat" pluralLabel="Maximum Heats" defaultValue="340"/>
+  <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+    <members xsi:type="act:ABuild" label="Build Heatbugs" ID="buildHeatbugs" targets="//@rootActivity/@members[ID='createHeatBugs'] //@rootActivity/@members[ID='buildGrids']" selected="//@rootActivity/@members[ID='buildHeatbugs']" agent="/" pluralLabel="Build Heatbugss"/>
+    <members xsi:type="act:ACreateAgents" label="Create Heat Bugs" ID="createHeatBugs" sources="//@rootActivity/@members[ID='buildHeatbugs']" selected="//@rootActivity/@members[ID='buildHeatbugs']" agent="//@agents[ID='heatBug']" agentCount="//@attributes[ID='heatBugCount']"/>
+    <members xsi:type="act:ABuildGrid" label="Build Grids" ID="buildGrids" sources="//@rootActivity/@members[ID='buildHeatbugs']" selected="//@rootActivity/@members[ID='buildHeatbugs']" pluralLabel="Build Gridss" agents="//@agents[ID='heatBug']" projection="//@projections[ID='heatGrid']" fillAgent="//@agents[ID='heatCell']"/>
+  </rootActivity>
+  <implementation package="org.eclipse.amp.examples.heatbugs" className="Heatbugs" basePath=""/>
+  <agents label="Heat Bug" ID="heatBug" pluralLabel="Heat Bugs">
+    <attributes label="Ideal Temperature" ID="idealTemperature" pluralLabel="Ideal Temperatures" sType="REAL"/>
+    <attributes label="Output Heat" ID="outputHeat" pluralLabel="Output Heats" sType="REAL"/>
+    <attributes label="Unhappiness" ID="unhappiness" pluralLabel="Unhappinesss" sType="REAL" gatherData="true" defaultValue="0.0" derived="true"/>
+    <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+      <members xsi:type="act:AInitialize" label="Initialize" ID="initialize" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatBug']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='heatBug']" pluralLabel="Initializes"/>
+      <members xsi:type="act:ASelect" label="Heat Bug" ID="heatBug" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='availableQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Available() Query" ID="availableQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatBug']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='moveHeatBug']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatBug']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='available']"/>
+      </members>
+      <members xsi:type="act:AMove" label="Move Heat Bug" ID="moveHeatBug" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='availableQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initialize']" destination="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatBug']"/>
+      <members xsi:type="act:ARule" label="Seek Heat Rule" ID="seekHeatRule" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" agent="//@agents[ID='heatBug']" pluralLabel="Seek Heat Rules"/>
+      <members xsi:type="act:ASelect" label="Ideal Heat" ID="idealHeat" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatLesserIdealTemperatureQuery']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='availableQueryCopy'] //@agents[ID='heatBug']/@rootActivity/@members[ID='neighborQuery'] //@agents[ID='heatBug']/@rootActivity/@members[ID='maximize_Heat_Query'] //@agents[ID='heatBug']/@rootActivity/@members[ID='includeSelfQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Available() Query Copy" ID="availableQueryCopy" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_And_AvailableQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='available']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Neighbor() Query" ID="neighborQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_And_AvailableQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Maximize(Heat) Query" ID="maximize_Heat_Query" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_And_AvailableQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='maximize']"/>
+      </members>
+      <members xsi:type="act:AAll" label="(&amp;) Available() Query Copy" ID="_And_AvailableQueryCopy" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='availableQueryCopy'] //@agents[ID='heatBug']/@rootActivity/@members[ID='neighborQuery'] //@agents[ID='heatBug']/@rootActivity/@members[ID='includeSelfQuery'] //@agents[ID='heatBug']/@rootActivity/@members[ID='maximize_Heat_Query']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='moveHeatBugCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']"/>
+      <members xsi:type="act:AMove" label="Move Heat Bug Copy" ID="moveHeatBugCopy" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='_And_AvailableQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" destination="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']"/>
+      <members xsi:type="act:AInitialize" label="Initialize State" ID="initializeState" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw'] //@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" agent="//@agents[ID='heatBug']" space="//@projections[ID='heatGrid']" pluralLabel="Initialize States"/>
+      <members xsi:type="act:AEvaluate" label="Ideal Temperature Draw" ID="idealTemperatureDraw" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='setIdealTemperatureToIdealTemperatureDraw']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Ideal Temperature States" ID="idealTemperatureStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Ideal Temperature Draw Minimum" ID="idealTemperatureDrawMinimum" values="//@attributes[ID='idealTemperatureDrawMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Ideal Temperature Draw Maximum" ID="idealTemperatureDrawMaximum" values="//@attributes[ID='idealTemperatureDrawMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Ideal Temperature To Ideal Temperature Draw" ID="setIdealTemperatureToIdealTemperatureDraw" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" attribute="//@agents[ID='heatBug']/@attributes[ID='idealTemperature']" parameter="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealTemperatureDraw']"/>
+      <members xsi:type="act:AEvaluate" label="Output Heat Draw" ID="outputHeatDraw" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='setOutputHeatToOutputHeatDraw']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']/@inputs.0/@literal">
+          <literal xsi:type="act:AMultiValue" label="Output Heat Draw States" ID="outputHeatDrawStates"/>
+        </inputs>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']/@inputs.1/@literal">
+          <literal xsi:type="act:AMultiValue" label="Output Heat Draw Minimum" ID="outputHeatDrawMinimum" values="//@attributes[ID='outputHeatDrawMinimum']"/>
+        </inputs>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']/@inputs.2/@literal">
+          <literal xsi:type="act:AMultiValue" label="Output Heat Draw Maximum" ID="outputHeatDrawMaximum" values="//@attributes[ID='outputHeatDrawMaximum']"/>
+        </inputs>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='distribution']/@functions[ID='uniformAdditiveDistribution']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Output Heat To Output Heat Draw" ID="setOutputHeatToOutputHeatDraw" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='initializeState']" attribute="//@agents[ID='heatBug']/@attributes[ID='outputHeat']" parameter="//@agents[ID='heatBug']/@rootActivity/@members[ID='outputHeatDraw']"/>
+      <members xsi:type="act:AQuery" label="Heat Lesser Ideal Temperature Query" ID="heatLesserIdealTemperatureQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='hereQuery']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat'] //@agents[ID='heatBug']/@rootActivity/@members[ID='not__Or_HeatLesserIdealTemperatureQuery_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" value="//@agents[ID='heatBug']/@attributes[ID='idealTemperature']"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='lesser']"/>
+      </members>
+      <members xsi:type="act:ASelect" label="Current Location" ID="currentLocation" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='hereQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Here() Query" ID="hereQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatLesserIdealTemperatureQuery'] //@agents[ID='heatBug']/@rootActivity/@members[ID='heatAddOutputHeat']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='here']"/>
+      </members>
+      <members xsi:type="act:ANone" label="!((|) Heat Lesser Ideal Temperature Query)" ID="not__Or_HeatLesserIdealTemperatureQuery_" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatLesserIdealTemperatureQuery']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']"/>
+      <members xsi:type="act:ASelect" label="Ideal Cool" ID="idealCool" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='not__Or_HeatLesserIdealTemperatureQuery_']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeHeat'] //@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeNeighbor'] //@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeAvailable'] //@agents[ID='heatBug']/@rootActivity/@members[ID='includeSelfQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Minimize Heat" ID="minimizeHeat" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='minimize']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Minimize Neighbor" ID="minimizeNeighbor" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='neighbor']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Minimize Available" ID="minimizeAvailable" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='available']"/>
+      </members>
+      <members xsi:type="act:AAll" label="(Minimize Heat &amp; Minimize Available &amp; Minimize Neighbor &amp; Include Self() Query Copy)" ID="_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='includeSelfQueryCopy'] //@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeAvailable'] //@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeNeighbor'] //@agents[ID='heatBug']/@rootActivity/@members[ID='minimizeHeat']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='moveHeatCell']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']"/>
+      <members xsi:type="act:AMove" label="Move Heat Cell" ID="moveHeatCell" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" destination="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']"/>
+      <members xsi:type="act:AEvaluate" label="Heat Add Output Heat" ID="heatAddOutputHeat" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='hereQuery']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='setHeatToHeatAddOutputHeat']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='seekHeatRule']" value="//@agents[ID='heatBug']/@attributes[ID='outputHeat']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='add']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Heat To Heat Add Output Heat" ID="setHeatToHeatAddOutputHeat" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatAddOutputHeat']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentLocation']" attribute="//@agents[ID='heatCell']/@attributes[ID='heat']" parameter="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatAddOutputHeat']"/>
+      <members xsi:type="act:AQuery" label="Include Self() Query" ID="includeSelfQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_And_AvailableQueryCopy']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealHeat']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='includeSelf']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="Include Self() Query Copy" ID="includeSelfQueryCopy" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='_MinimizeHeatAndMinimizeAvailableAndMinimizeNeighborAndIncludeSelfQueryCopy_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='idealCool']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='includeSelf']"/>
+      </members>
+      <members xsi:type="act:ADerive" label="Derive Unhappiness" ID="deriveUnhappiness" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHeatCell']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']" attribute="//@agents[ID='heatBug']/@attributes[ID='unhappiness']" agent="//@agents[ID='heatBug']"/>
+      <members xsi:type="act:ASelect" label="Current Heat Cell" ID="currentHeatCell" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHere']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Current Here" ID="currentHere" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHeatCell']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatSubtractIdealTemperatureQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHeatCell']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='here']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Heat Subtract Ideal Temperature Query" ID="heatSubtractIdealTemperatureQuery" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHere']" targets="//@agents[ID='heatBug']/@rootActivity/@members[ID='absoluteValue_HeatSubtractIdealTemperatureQuery_']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='currentHeatCell']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']" value="//@agents[ID='heatBug']/@attributes[ID='idealTemperature']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='sub']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="Absolute Value(Heat Subtract Ideal Temperature Query)" ID="absoluteValue_HeatSubtractIdealTemperatureQuery_" sources="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatSubtractIdealTemperatureQuery']" selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']">
+        <inputs selected="//@agents[ID='heatBug']/@rootActivity/@members[ID='deriveUnhappiness']" value="//@agents[ID='heatBug']/@rootActivity/@members[ID='heatSubtractIdealTemperatureQuery']"/>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='math']/@functions[ID='abs']"/>
+      </members>
+    </rootActivity>
+    <implementation className="HeatBug"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Heat Bug Style 2D" ID="heatBugStyle2D" pluralLabel="Heat Bug Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+        <members xsi:type="act:ARule" label="Heat Bug Rule" ID="heatBugRule" targets="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='colorGreen']" selected="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='heatBugRule']" agent="//@agents[ID='heatBug']" space="//@projections[ID='heatGrid']" pluralLabel="Heat Bug Rules"/>
+        <members xsi:type="act:AEvaluate" label="Color Green()" ID="colorGreen" sources="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='heatBugRule']" targets="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='shapeOval']" selected="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='heatBugRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorGreen']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Shape Oval()" ID="shapeOval" sources="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='colorGreen']" targets="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='graphicFill']" selected="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='heatBugRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeOval']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Graphic Fill()" ID="graphicFill" sources="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='shapeOval']" selected="//@agents[ID='heatBug']/@styles[ID='heatBugStyle2D']/@rootActivity/@members[ID='heatBugRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+      </rootActivity>
+      <implementation className="HeatBugStyle2D"/>
+    </styles>
+  </agents>
+  <agents label="Heat Cell" ID="heatCell" pluralLabel="Heat Cells">
+    <attributes label="Heat" ID="heat" pluralLabel="Heats" sType="REAL" units=""/>
+    <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+      <members xsi:type="act:ADiffuse" label="Diffuse" ID="diffuse" selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='diffuse']" agent="//@agents[ID='heatCell']" diffused="//@agents[ID='heatCell']/@attributes[ID='heat']" diffusionRate="//@attributes[ID='diffusionRate']" evaporationRate="//@attributes[ID='evaporationRate']"/>
+      <members xsi:type="act:AWatch" label="Watch Heat" ID="watchHeat" targets="//@agents[ID='heatCell']/@rootActivity/@members[ID='heatGreaterMaximumHeatQuery']" selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']" attribute="//@agents[ID='heatCell']/@attributes[ID='heat']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']"/>
+      <members xsi:type="act:AQuery" label="Heat Greater Maximum Heat Query" ID="heatGreaterMaximumHeatQuery" sources="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']" targets="//@agents[ID='heatCell']/@rootActivity/@members[ID='setHeatToMaximumHeat']" selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']">
+        <inputs selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+        <inputs selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']" value="//@attributes[ID='maximumHeat']"/>
+        <function xsi:type="function:FLogicalOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='logicalOperators']/@functions[ID='greater']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Heat To Maximum Heat" ID="setHeatToMaximumHeat" sources="//@agents[ID='heatCell']/@rootActivity/@members[ID='heatGreaterMaximumHeatQuery']" selected="//@agents[ID='heatCell']/@rootActivity/@members[ID='watchHeat']" attribute="//@agents[ID='heatCell']/@attributes[ID='heat']" parameter="//@attributes[ID='maximumHeat']"/>
+    </rootActivity>
+    <implementation className="HeatCell"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Heat Cell Style 2D" ID="heatCellStyle2D" pluralLabel="Heat Cell Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Actions" ID="actions" pluralLabel="Actionss">
+        <members xsi:type="act:ARule" label="Heat Cell Rule" ID="heatCellRule" targets="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatDivideHeatDivideMaximumHeat']" selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']" agent="//@agents[ID='heatCell']" space="//@projections[ID='heatGrid']" pluralLabel="Heat Cell Rules"/>
+        <members xsi:type="act:AEvaluate" label="Color RGB(Heat Divide Heat Divide Maximum Heat, Zero, Zero)" ID="colorRGB_HeatDivideHeatDivideMaximumHeatZeroZero_" sources="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatDivideHeatDivideMaximumHeat']" targets="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+          <inputs selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']" value="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatDivideHeatDivideMaximumHeat']"/>
+          <inputs selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+            <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='zero']"/>
+          </inputs>
+          <inputs selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+            <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='zero']"/>
+          </inputs>
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorRGB']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Shape Rectangle()" ID="shapeRectangle" sources="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='colorRGB_HeatDivideHeatDivideMaximumHeatZeroZero_']" targets="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='graphicFill']" selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeRectangle']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Graphic Fill()" ID="graphicFill" sources="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='shapeRectangle']" selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Heat Divide Heat Divide Maximum Heat" ID="heatDivideHeatDivideMaximumHeat" sources="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']" targets="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='colorRGB_HeatDivideHeatDivideMaximumHeatZeroZero_']" selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']">
+          <inputs selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']" value="//@agents[ID='heatCell']/@attributes[ID='heat']"/>
+          <inputs selected="//@agents[ID='heatCell']/@styles[ID='heatCellStyle2D']/@rootActivity/@members[ID='heatCellRule']" value="//@attributes[ID='maximumHeat']"/>
+          <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='div']"/>
+        </members>
+      </rootActivity>
+      <implementation className="HeatCellStyle2D"/>
+    </styles>
+  </agents>
+  <projections xsi:type="metaabm:SGrid" label="Heat Grid" ID="heatGrid" pluralLabel="Heat Grids" dimensionality="2" neighborhood="MOORE">
+    <attributes label="Width" ID="width" pluralLabel="Widths" description="The horizontal extent of the space." defaultValue="100"/>
+    <attributes label="Height" ID="height" pluralLabel="Heights" description="The vertical extent of the space." defaultValue="100"/>
+  </projections>
+</metaabm:SContext>

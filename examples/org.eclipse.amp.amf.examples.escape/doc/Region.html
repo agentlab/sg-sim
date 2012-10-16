@@ -1,0 +1,269 @@
+		<HTML>
+			<HEAD>
+				<TITLE>Region</TITLE>
+				<STYLE TYPE="text/css">
+					body,
+					html {
+    					margin:0;
+    					padding:0;
+    					
+    					color:#000;
+    				}
+    				body {
+    					min-width:750px;
+    				}
+					#wrap {
+    					
+    					margin:0 auto;
+    					width:1024px;
+    				}
+    				#header {
+    					border-bottom: solid 1px #BEBFAA;   						
+    					left: 220px;
+    				}
+					#nav {
+    					
+    				}
+					#nav ul{
+   						margin:0;
+    					padding:0;
+    					list-style:none;
+    				}
+					#nav li{
+    					display:inline;
+    					margin:0;
+    					padding:0;
+    				}
+    				#main {
+    					border-left: solid 1px #BEBFAA;   						
+    					
+    					float:left;
+    					width:800px;
+    				}
+					#sidebarfake {
+      					float:left;
+    					width:200px;
+    				}
+					#sidebar {
+  						position: fixed;
+      					float:left;
+    					width:200px;
+    				}
+					#footer {
+    					border-top: solid 1px #BEBFAA;   						
+    					
+    					clear:both;
+    				}
+    				
+					#section {
+  						background: #FFFFDC;
+   						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+					#section h1 {
+   						text-align: left;
+   						font-family: sans-serif;
+					}
+					#section p {
+   						text-indent: 2em;
+					}
+					#section p.noindent {
+   						text-indent: 0;
+					}
+					
+					#agent {
+  						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+
+					#agents {
+						border-bottom: solid 1px black;
+						border-left: solid 1px #BEBFAA;
+						border-right: solid 1px black;
+						border-top: solid 1px #BEBFAA;
+						margin: 2em 1em 1em 2em;
+						padding: 0.5em 2em 2em 2em;
+						text-align: justify;
+					}
+				</STYLE>
+			</HEAD>
+			<BODY>
+			<div id="wrap">
+    			<div id="header">
+    				<H1>Region</H1>
+					<P></P>
+    			</div>
+    			<div id="sidebarfake">
+    				<H1>   </H1>
+    			</div>
+    			<div id="sidebar">
+			    <ul>
+    					<li><a href="#parlink">Parameters</a></li>
+    					<li><a href="#behaviorlink">Behaviors</a></li>
+    					<li><a href="#agentslink">Agents</a>
+    					<ul>
+    					<li><a href="#citylink">City</a></li>
+    					<li><a href="#regionalLocationlink">Regional Location</a></li>
+    					</ul></li>
+    					<li><a href="#projlink">Projections</a></li>
+    				</ul>    				
+    			</div>
+    			<div id="main">
+    					<div id="agent">
+
+    					<h3><a name="parlink">Parameters</a></h3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>City Count</td>
+						<td>Integer</td>
+						<td>4</td></tr>
+					<tr><td colspan="3"><i>The number of citys to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Initial Infection Probability</td>
+						<td>Real</td>
+						<td>.05</td></tr>
+					<tr><td colspan="3"><i>The probability that any given individual will be infected at the beginning of the model run. For example, if this value is .15, and their are 100 individuals in the model, roughly 15 of those individuals will be infected at time 0.</i></td></tr></tbody>
+					<tbody ><tr><td>Min Contact Transmission Probability</td>
+						<td>Real</td>
+						<td>.08</td></tr>
+					<tr><td colspan="3"><i>The probability that proximity to a single neighbor for a single period will result in transmission of infection.</i></td></tr></tbody>
+					<tbody ><tr><td>Max Contact Transmission Probability</td>
+						<td>Real</td>
+						<td>.16</td></tr>
+					<tr><td colspan="3"><i>The probability that proximity to a single neighbor for a single period will result in transmission of infection.</i></td></tr></tbody>
+					<tbody ><tr><td>Case Mortality Rate</td>
+						<td>Real</td>
+						<td>.05</td></tr>
+					<tr><td colspan="3"><i>The probability that death will occur for a given individual as a result of infection.</i></td></tr></tbody>
+					<tbody ><tr><td>Min Period Exposure</td>
+						<td>Integer</td>
+						<td>12</td></tr>
+					<tr><td colspan="3"><i>Minimum time from initial exposure to infectious asymptomatic or symptomatic state. 0 or greater.</i></td></tr></tbody>
+					<tbody ><tr><td>Max Period Exposure</td>
+						<td>Integer</td>
+						<td>48</td></tr>
+					<tr><td colspan="3"><i>Maximum time from initial exposure to infectious asymptomatic or symptomatic state. 0 or greater.</i></td></tr></tbody>
+					<tbody ><tr><td>Min Period Asymptom Infection</td>
+						<td>Integer</td>
+						<td>24</td></tr>
+					<tr><td colspan="3"><i>Maximum time spent infected without showing symptoms. 0 or greater.</i></td></tr></tbody>
+					<tbody ><tr><td>Max Period Asymptom Infection</td>
+						<td>Integer</td>
+						<td>96</td></tr>
+					<tr><td colspan="3"><i>Maximum time spent infected without showing symptoms. May be zero!</i></td></tr></tbody>
+					<tbody ><tr><td>Min Period Symptom Infection</td>
+						<td>Integer</td>
+						<td>24</td></tr>
+					<tr><td colspan="3"><i>Minimum time spent infected with obvious symptoms. 0 or greater.</i></td></tr></tbody>
+					<tbody ><tr><td>Max Period Symptom Infection</td>
+						<td>Integer</td>
+						<td>168</td></tr>
+					<tr><td colspan="3"><i>Maximum time spent infected with obvious symptoms. 1 or greater.</i></td></tr></tbody>
+					<tbody ><tr><td>Movement Probability</td>
+						<td>Real</td>
+						<td>.5</td></tr>
+					<tr><td colspan="3"><i>The liklihood that an agent will move within a given period.</i></td></tr></tbody>
+					<tbody ><tr><td>Migration Probability</td>
+						<td>Real</td>
+						<td>0.1</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Regional Location Count</td>
+						<td>Integer</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i>The number of regional locations to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Initial City Assigned</td>
+						<td>Boolean</td>
+						<td>false</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+    					<h3><a name="behaviorlink">Behaviors</a></h3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Build Region</i></td>
+						<td>Build the Region.</td>
+					</tr>
+		</table>
+						</div>
+    					<div id="agents">
+    					<h1><a name="agentslink">Agents</a></h1>
+								<div id="agent">
+									<H2><a name="citylink"/>City</a></H2>
+									A simple model of epidemic dynamics. We define individual agents with different disease states. The progression of disease moves from succeptible to exposed to infectious (either symptomatic or asymptomatic) to some outcome state. Agents can transmit infection to their immediate neighbors.
+
+For some background on the general approach, see Joshua M. Epstein. "Generative Social Science". 2006. Princeton. 
+
+Copyright 2009, Miles Parker. Released under Eclipse Public License. All uses should be attributed.									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Individual Count</td>
+						<td>Integer</td>
+						<td>300</td></tr>
+					<tr><td colspan="3"><i>The number of individuals to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Periods per Day</td>
+						<td>Integer</td>
+						<td>24</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Location Count</td>
+						<td>Integer</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i>The number of locations to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Community Infection Status</td>
+						<td>Symbol</td>
+						<td>No Infections</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Build Epidemic</i></td>
+						<td>Build the City.</td>
+					</tr>
+					<tr>
+						<td><i>Setup Location</i></td>
+						<td>Setup Location Initialization. Executed once at the beginning of each model run.</td>
+					</tr>
+		</table>
+								</div>
+								<div id="agent">
+									<H2><a name="regionalLocationlink"/>Regional Location</a></H2>
+									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+		</table>
+								</div>
+						</div>
+					<div id="section">
+						<H2><a name="projlink"/>Projections:</a></H2>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Name</th><th>Description</th><th>Type</th></tr></thead>
+					<tr>
+						<td><i>Regional Map</i></td>
+						<td></td>
+						<td>2-Dimensional Grid</td>
+					</tr>
+		</table>
+					</div>			    			
+    			</div>
+			    
+    			<div id="footer">
+					<P>Generated by AMF.</P>
+    			</div>
+			</div>
+			</BODY>
+		</HTML>
+	

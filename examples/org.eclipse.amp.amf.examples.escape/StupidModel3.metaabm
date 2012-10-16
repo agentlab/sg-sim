@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metaabm:SContext xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:act="http://metaabm.org/act" xmlns:function="http://metaabm.org/function" xmlns:metaabm="http://metaabm.org/structure" label="Stupid Model 3" ID="stupidModel3" pluralLabel="Stupid Model 3s">
+  <attributes label="Bug Count" ID="bugCount" pluralLabel="Bug Counts" description="The number of bugs to create." sType="INTEGER" defaultValue="100"/>
+  <attributes label="Habitat Count" ID="habitatCount" pluralLabel="Habitat Counts" description="The number of habitats to create." sType="INTEGER"/>
+  <attributes label="Bug Vision" ID="bugVision" pluralLabel="Bug Visions" sType="INTEGER" defaultValue="4"/>
+  <rootActivity xsi:type="act:AGroup" label="Root Act Group" ID="rootActGroup" pluralLabel="Root Act Groups">
+    <members xsi:type="act:ABuild" label="Build stupidModel3" ID="buildstupidModel3" targets="//@rootActivity/@members[ID='createBugs'] //@rootActivity/@members[ID='createHabitats'] //@rootActivity/@members[ID='fillGrid']" selected="//@rootActivity/@members[ID='buildstupidModel3']" agent="/" pluralLabel="Build stupidModel3s"/>
+    <members xsi:type="act:ACreateAgents" label="Create Bugs" ID="createBugs" sources="//@rootActivity/@members[ID='buildstupidModel3']" selected="//@rootActivity/@members[ID='buildstupidModel3']" agent="//@agents[ID='bug']" agentCount="//@attributes[ID='bugCount']"/>
+    <members xsi:type="act:ACreateAgents" label="Create Habitats" ID="createHabitats" sources="//@rootActivity/@members[ID='buildstupidModel3']" selected="//@rootActivity/@members[ID='buildstupidModel3']" agent="//@agents[ID='habitat']" agentCount="//@attributes[ID='habitatCount']"/>
+    <members xsi:type="act:ABuildGrid" label="Fill Grid" ID="fillGrid" sources="//@rootActivity/@members[ID='buildstupidModel3']" selected="//@rootActivity/@members[ID='buildstupidModel3']" pluralLabel="Fill Grids" agents="//@agents[ID='bug']" projection="//@projections[ID='grid2D']" fillAgent="//@agents[ID='habitat']"/>
+  </rootActivity>
+  <implementation package="org.metaabm.examples.stupid3" className="StupidModel3" basePath=""/>
+  <agents label="Bug" ID="bug" pluralLabel="Bugs">
+    <attributes label="Size" ID="size" pluralLabel="Sizes" sType="INTEGER" defaultValue="0"/>
+    <rootActivity xsi:type="act:AGroup" label="Root Act Group" ID="rootActGroup" pluralLabel="Root Act Groups">
+      <members xsi:type="act:AInitialize" label="Initialize" ID="initialize" targets="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitat']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='bug']" space="//@projections[ID='grid2D']" pluralLabel="Initializes"/>
+      <members xsi:type="act:ASelect" label="RandomHabitat" ID="randomHabitat" sources="//@agents[ID='bug']/@rootActivity/@members[ID='initialize']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitatAvailableQuery']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='initialize']" agent="//@agents[ID='habitat']" space="//@projections[ID='grid2D']"/>
+      <members xsi:type="act:AQuery" label="RandomHabitat: Available() Query" ID="randomHabitatAvailableQuery" sources="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitat']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='movetoHabitatinGrid2D']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitat']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='available']"/>
+      </members>
+      <members xsi:type="act:AMove" label="Move to Habitat in Grid 2D" ID="movetoHabitatinGrid2D" sources="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitatAvailableQuery']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='initialize']" destination="//@agents[ID='bug']/@rootActivity/@members[ID='randomHabitat']"/>
+      <members xsi:type="act:ARule" label="Random Movement" ID="randomMovement" targets="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='randomMovement']" agent="//@agents[ID='bug']" space="//@projections[ID='grid2D']" pluralLabel="Random Movements"/>
+      <members xsi:type="act:ASelect" label="NearbySpace" ID="nearbySpace" sources="//@agents[ID='bug']/@rootActivity/@members[ID='randomMovement']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpaceAvailableQuery'] //@agents[ID='bug']/@rootActivity/@members[ID='nearbySpaceWithin_BugVision_Query']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='randomMovement']" agent="//@agents[ID='habitat']" space="//@projections[ID='grid2D']"/>
+      <members xsi:type="act:AQuery" label="NearbySpace: Available() Query" ID="nearbySpaceAvailableQuery" sources="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace_AvailableQueryAndWithin_BugVision_Query_']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']">
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='available']"/>
+      </members>
+      <members xsi:type="act:AQuery" label="NearbySpace: Within(Bug Vision) Query" ID="nearbySpaceWithin_BugVision_Query" sources="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace_AvailableQueryAndWithin_BugVision_Query_']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']">
+        <inputs selected="//@agents[ID='bug']/@rootActivity/@members[ID='randomMovement']" value="//@attributes[ID='bugVision']"/>
+        <function xsi:type="function:FGenericLogical" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='spatial']/@functions[ID='within']"/>
+      </members>
+      <members xsi:type="act:AAll" label="NearbySpace (Available() Query &amp; Within(Bug Vision) Query)" ID="nearbySpace_AvailableQueryAndWithin_BugVision_Query_" sources="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpaceAvailableQuery'] //@agents[ID='bug']/@rootActivity/@members[ID='nearbySpaceWithin_BugVision_Query']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='movetoHabitatinGrid2DCopy']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']"/>
+      <members xsi:type="act:AMove" label="Move to Habitat in Grid 2D Copy" ID="movetoHabitatinGrid2DCopy" sources="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace_AvailableQueryAndWithin_BugVision_Query_']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='randomMovement']" destination="//@agents[ID='bug']/@rootActivity/@members[ID='nearbySpace']"/>
+      <members xsi:type="act:ARule" label="Grow" ID="grow" targets="//@agents[ID='bug']/@rootActivity/@members[ID='growIncrementSize']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='grow']" agent="//@agents[ID='bug']" space="//@projections[ID='grid2D']" pluralLabel="Grows"/>
+      <members xsi:type="act:AEvaluate" label="Grow: Increment Size" ID="growIncrementSize" sources="//@agents[ID='bug']/@rootActivity/@members[ID='grow']" targets="//@agents[ID='bug']/@rootActivity/@members[ID='setSizeToGrowIncrementSize']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='grow']">
+        <inputs selected="//@agents[ID='bug']/@rootActivity/@members[ID='grow']" value="//@agents[ID='bug']/@attributes[ID='size']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='increment']"/>
+      </members>
+      <members xsi:type="act:ASet" label="Set Size To Grow: Increment Size" ID="setSizeToGrowIncrementSize" sources="//@agents[ID='bug']/@rootActivity/@members[ID='growIncrementSize']" selected="//@agents[ID='bug']/@rootActivity/@members[ID='grow']" attribute="//@agents[ID='bug']/@attributes[ID='size']" parameter="//@agents[ID='bug']/@rootActivity/@members[ID='growIncrementSize']"/>
+    </rootActivity>
+    <implementation className="Bug"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Bug Style 2D" ID="bugStyle2D" pluralLabel="Bug Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Root Act Group" ID="rootActGroup" pluralLabel="Root Act Groups">
+        <members xsi:type="act:ARule" label="Bug Rule" ID="bugRule" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeRatio']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" agent="//@agents[ID='bug']" space="//@projections[ID='grid2D']" pluralLabel="Bug Rules"/>
+        <members xsi:type="act:AEvaluate" label="Bug Size Ratio" ID="bugSizeRatio" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeUnit']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@attributes[ID='size']"/>
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeRatio']/@inputs.1/@literal">
+            <literal label="Literal 10.0" ID="literal10pt0" valueLiteral="10.0"/>
+          </inputs>
+          <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='div']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Bug Size Unit" ID="bugSizeUnit" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeRatio']" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='invertBugSize']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeRatio']"/>
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeUnit']/@inputs.1/@literal">
+            <literal label="Literal 1.0" ID="literal1pt0" valueLiteral="1.0"/>
+          </inputs>
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='math']/@functions[ID='min']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Bug Rule: Color RGB(Bug Rule: Minimum(Bug Size Ratio, Literal 1.0), Literal 1.0, Literal 1.0)" ID="bugRuleColorRGB_BugRuleMinimum_BugSizeRatioLiteral1pt0_Literal1pt0Literal1pt0_" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='invertBugSize']" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleShapeOval']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleColorRGB_BugRuleMinimum_BugSizeRatioLiteral1pt0_Literal1pt0Literal1pt0_']/@inputs.0/@literal">
+            <literal label="Literal 1.0" ID="literal1pt0" valueLiteral="1.0"/>
+          </inputs>
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='invertBugSize']"/>
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='invertBugSize']"/>
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorRGB']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Bug Rule: Shape Oval()" ID="bugRuleShapeOval" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleColorRGB_BugRuleMinimum_BugSizeRatioLiteral1pt0_Literal1pt0Literal1pt0_']" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleGraphicFill']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeOval']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Bug Rule: Graphic Fill()" ID="bugRuleGraphicFill" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleShapeOval']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Invert Bug Size" ID="invertBugSize" sources="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeUnit']" targets="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRuleColorRGB_BugRuleMinimum_BugSizeRatioLiteral1pt0_Literal1pt0Literal1pt0_']" selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']">
+            <value xsi:type="metaabm:SAttribute" href="http://metaabm.org/core_library.metaabm#//@attributes[ID='unit']"/>
+          </inputs>
+          <inputs selected="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugRule']" value="//@agents[ID='bug']/@styles[ID='bugStyle2D']/@rootActivity/@members[ID='bugSizeUnit']"/>
+          <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='sub']"/>
+        </members>
+      </rootActivity>
+      <implementation className="BugStyle2D"/>
+    </styles>
+  </agents>
+  <agents label="Habitat" ID="habitat" pluralLabel="Habitats">
+    <attributes label="FoodAvailability" ID="foodAvailability" pluralLabel="FoodAvailabilitys" sType="REAL" defaultValue="0.0"/>
+    <attributes label="MaximumFoodProductionRate" ID="maximumFoodProductionRate" pluralLabel="MaximumFoodProductionRates" sType="REAL" defaultValue="0.01"/>
+    <rootActivity xsi:type="act:AGroup" label="Root Act Group" ID="rootActGroup" pluralLabel="Root Act Groups">
+      <members xsi:type="act:ARule" label="determindFoodProduction" ID="determindFoodProduction" targets="//@agents[ID='habitat']/@rootActivity/@members[ID='calculateFoodProductionRate']" selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" agent="//@agents[ID='habitat']" space="//@projections[ID='grid2D']" pluralLabel="determindFoodProductions"/>
+      <members xsi:type="act:AEvaluate" label="CalculateFoodProductionRate" ID="calculateFoodProductionRate" sources="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" targets="//@agents[ID='habitat']/@rootActivity/@members[ID='newFoodProductionValue']" selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']">
+        <inputs selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" value="//@agents[ID='habitat']/@rootActivity/@members[ID='calculateFoodProductionRate']/@inputs.0/@literal">
+          <literal label="MinimumProduction" ID="minimumProduction" valueLiteral="0"/>
+        </inputs>
+        <inputs selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" value="//@agents[ID='habitat']/@attributes[ID='maximumFoodProductionRate']"/>
+        <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='random']/@functions[ID='randomInRange']"/>
+      </members>
+      <members xsi:type="act:AEvaluate" label="NewFoodProductionValue" ID="newFoodProductionValue" sources="//@agents[ID='habitat']/@rootActivity/@members[ID='calculateFoodProductionRate']" targets="//@agents[ID='habitat']/@rootActivity/@members[ID='setFoodAvailablity']" selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']">
+        <inputs selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" value="//@agents[ID='habitat']/@attributes[ID='foodAvailability']"/>
+        <inputs selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" value="//@agents[ID='habitat']/@rootActivity/@members[ID='calculateFoodProductionRate']"/>
+        <function xsi:type="function:FOperator" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='operators']/@subs[ID='numericOperators']/@functions[ID='add']"/>
+      </members>
+      <members xsi:type="act:ASet" label="SetFoodAvailablity" ID="setFoodAvailablity" sources="//@agents[ID='habitat']/@rootActivity/@members[ID='newFoodProductionValue']" selected="//@agents[ID='habitat']/@rootActivity/@members[ID='determindFoodProduction']" attribute="//@agents[ID='habitat']/@attributes[ID='foodAvailability']" parameter="//@agents[ID='habitat']/@rootActivity/@members[ID='newFoodProductionValue']"/>
+    </rootActivity>
+    <implementation className="Habitat"/>
+    <styles xsi:type="metaabm:SStyle2D" label="Habitat Style 2D" ID="habitatStyle2D" pluralLabel="Habitat Style 2Ds">
+      <rootActivity xsi:type="act:AGroup" label="Root Act Group" ID="rootActGroup" pluralLabel="Root Act Groups">
+        <members xsi:type="act:ARule" label="Habitat Rule" ID="habitatRule" targets="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRuleColorBlack']" selected="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRule']" agent="//@agents[ID='habitat']" space="//@projections[ID='grid2D']" pluralLabel="Habitat Rules"/>
+        <members xsi:type="act:AEvaluate" label="Habitat Rule: Color Black()" ID="habitatRuleColorBlack" sources="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRule']" targets="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRuleShapeRectangle']" selected="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='colorBlack']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Habitat Rule: Shape Rectangle()" ID="habitatRuleShapeRectangle" sources="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRuleColorBlack']" targets="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRuleGraphicFill']" selected="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='shapeRectangle']"/>
+        </members>
+        <members xsi:type="act:AEvaluate" label="Habitat Rule: Graphic Fill()" ID="habitatRuleGraphicFill" sources="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRuleShapeRectangle']" selected="//@agents[ID='habitat']/@styles[ID='habitatStyle2D']/@rootActivity/@members[ID='habitatRule']">
+          <function xsi:type="function:FGenericFunction" href="http://metaabm.org/core_library.metaabm#//@library[ID='coreFunctions']/@subs[ID='graphic']/@functions[ID='graphicFill']"/>
+        </members>
+      </rootActivity>
+      <implementation className="HabitatStyle2D"/>
+    </styles>
+  </agents>
+  <projections xsi:type="metaabm:SGrid" label="Grid 2D" ID="grid2D" pluralLabel="Grid 2Ds" dimensionality="2" borderRule="PERIODIC" neighborhood="MOORE">
+    <attributes xsi:type="metaabm:SAttributeArray" label="Dimensions" ID="dimensions" pluralLabel="Dimensionss" description="The size of each dimension." sType="INTEGER" size="2"/>
+    <attributes label="Width" ID="width" pluralLabel="Widths" description="The horizontal extent of the space." sType="INTEGER" defaultValue="100"/>
+    <attributes label="Height" ID="height" pluralLabel="Heights" description="The vertical extent of the space." sType="INTEGER" defaultValue="100"/>
+  </projections>
+</metaabm:SContext>

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.eclipse.amp.amf.examples.escape
+Bundle-SymbolicName: org.eclipse.amp.amf.examples.escape
+Bundle-Version: 0.8.0
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.amp.escape.runtime

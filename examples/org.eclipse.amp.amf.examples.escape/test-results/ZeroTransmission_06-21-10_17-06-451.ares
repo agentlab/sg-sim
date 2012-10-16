@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ares:RunSet xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aBase="http://www.eclipse.org/amp/amf/abase/ABase" xmlns:ares="http://eclipse.org.eclipse.amp/ares" result="SUCCESS">
+  <runs result="SUCCESS" started="2010-06-21T17:06:32.818-0600" finished="2010-06-21T17:06:35.027-0600">
+    <model href="../Epidemic.metaabm#/"/>
+    <test href="../tests/ZeroTransmission.atest#/"/>
+    <parameterization href="../params/EpiZeroTransmission.apar#/"/>
+    <parameters>
+      <attribute href="../Epidemic.metaabm#//@attributes[ID='minContactTransmissionProbability']"/>
+      <value xsi:type="aBase:RealValue" value="0.0"/>
+    </parameters>
+    <parameters>
+      <attribute href="../Epidemic.metaabm#//@attributes[ID='maxContactTransmissionProbability']"/>
+      <value xsi:type="aBase:RealValue" value="0.0"/>
+    </parameters>
+    <parameters>
+      <attribute href="http://metaabm.org/Engine.metaabm#//@attributes[ID='stopPeriod']"/>
+      <value xsi:type="aBase:IntValue" value="500"/>
+    </parameters>
+    <constraints>
+      <agent href="../Epidemic.metaabm#//@agents[ID='individual']"/>
+      <attribute href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']"/>
+      <qualifier href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']/@options.5"/>
+      <minValue xsi:type="aBase:IntValue" value="0"/>
+      <maxValue xsi:type="aBase:IntValue" value="5"/>
+    </constraints>
+    <constraints>
+      <agent href="../Epidemic.metaabm#//@agents[ID='individual']"/>
+      <attribute href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']"/>
+      <qualifier href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']/@options.1"/>
+      <minValue xsi:type="aBase:IntValue" value="0"/>
+      <maxValue xsi:type="aBase:IntValue" value="10"/>
+    </constraints>
+    <constraints>
+      <agent href="../Epidemic.metaabm#//@agents[ID='individual']"/>
+      <attribute href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']"/>
+      <qualifier href="../Epidemic.metaabm#//@agents[ID='individual']/@attributes[ID='status']/@options.3"/>
+      <minValue xsi:type="aBase:IntValue" value="0"/>
+      <maxValue xsi:type="aBase:IntValue" value="0"/>
+    </constraints>
+    <results constraint="//@runs.0/@constraints.0" issue="NONE" actualValue="3.0"/>
+    <results constraint="//@runs.0/@constraints.1" issue="NONE"/>
+    <results constraint="//@runs.0/@constraints.2" issue="NONE"/>
+  </runs>
+</ares:RunSet>

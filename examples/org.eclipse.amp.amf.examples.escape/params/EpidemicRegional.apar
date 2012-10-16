@@ -1,0 +1,4 @@
+model "|EpidemicRegional.metaabm" 
+InitialInfectionProbability=0.002
+MaxContactTransmissionProbability=.1
+MigrationProbability=.001

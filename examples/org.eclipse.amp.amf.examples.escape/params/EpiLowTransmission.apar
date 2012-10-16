@@ -1,0 +1,4 @@
+model "|Epidemic.metaabm"
+incorporates "EpiBase.apar"
+MinContactTransmissionProbability=0.0
+MaxContactTransmissionProbability=0.15

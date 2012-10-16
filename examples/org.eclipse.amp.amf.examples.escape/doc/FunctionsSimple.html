@@ -1,0 +1,395 @@
+
+		<HTML>
+			<HEAD>
+				<TITLE>Functions</TITLE>
+			</HEAD>
+			<BODY>
+				<H1>Functions</H1>
+				
+	<H3>Core Functions</H3>
+	<i></i><BR/>
+	
+		<H4>Members</H4>
+		
+	<H3>Operators</H3>
+	<i></i><BR/>
+	
+		<H4>Members</H4>
+		
+	<H3>Logical Operators</H3>
+	<i>Logical operators allow comparison between values. They are typically used in Query terms but may be used in Evaluate actions as well.</i><BR/>
+	
+		<H5>Not</H5>
+		<i></i><BR/>
+	
+		<H5>Equal</H5>
+		<i></i><BR/>
+	
+		<H5>Identical</H5>
+		<i></i><BR/>
+	
+		<H5>Greater</H5>
+		<i></i><BR/>
+	
+		<H5>Lesser</H5>
+		<i></i><BR/>
+	
+		<H5>Greater or Equal</H5>
+		<i></i><BR/>
+	
+		<H5>Lesser or Equal</H5>
+		<i></i><BR/>
+	
+		<H5>True</H5>
+		<i></i><BR/>
+	
+		<H5>False</H5>
+		<i></i><BR/>
+	
+		<H5>Identity</H5>
+		<i></i><BR/>
+	
+		<H5>Different</H5>
+		<i></i><BR/>
+	
+
+	<H3>Numeric Operators</H3>
+	<i>Numeric operators support all of the basic operators used in evaluations.</i><BR/>
+	
+		<H5>Negative Value</H5>
+		<i></i><BR/>
+	
+		<H5>Add</H5>
+		<i></i><BR/>
+	
+		<H5>Subtract</H5>
+		<i></i><BR/>
+	
+		<H5>Multiply</H5>
+		<i></i><BR/>
+	
+		<H5>Divide</H5>
+		<i></i><BR/>
+	
+		<H5>Power</H5>
+		<i></i><BR/>
+	
+		<H5>Modulo</H5>
+		<i></i><BR/>
+	
+		<H5>Increment</H5>
+		<i>Incremented numeric value by 1 unit. Not transformative of initial value like C!</i><BR/>
+	
+		<H5>Decrement</H5>
+		<i>Decrement numeric value by 1 unit.</i><BR/>
+	
+		<H5>Unit Value</H5>
+		<i>The value of one common unit, e.g. 1.</i><BR/>
+	
+		<H5>Zero Value</H5>
+		<i>The value of no units, e.g. zero.</i><BR/>
+	
+		<H5>Original Value</H5>
+		<i>The original value, e.g. the value for the value client at time 0.</i><BR/>
+	
+
+
+	<H3>Spatial</H3>
+	<i>Spatial functions provide the core functionality for Agent Models. Spatial functions are polymorphic, which basically means that they don't care what space they are operating on as long as that space is suitable for them. Spatial functions are designed to collaborate with one another. For example, by intersecting the "Neighbor", "Available" and "Toward" functions, we can design a rule that causes the agent to move to the next neighboring cell that get's it closer to some target agent. See the function details for more information.</i><BR/>
+	
+		<H5>Nearest </H5>
+		<i>Represents the nearest agents (including gird cells) or locations to this agent. If more than one agent or location is the same distance away they will all be considered. Note that while this function is defined for the selection of an agent, the result of this function is defined by the context within which it is used. If the selection specifies another agent within a space, this function will represent the nearest agent in that space. If the selection specifies a Cell within a grid space, this function will represent that cell.</i><BR/>
+	
+		<H5>Toward</H5>
+		<i>Represents a location that is on the shortest path to a particular agent or location from the source agent (that is, the selection's selection's agent). This function collaborates with the within and neighbor functions to allow the agent to move in a particular direction towards some objective.</i><BR/>
+	
+		<H5>Within</H5>
+		<i>Represents a limit to the distance of a spatial search. When used in combination with other spatial functions such as "nearest" requires that all agents or locations must be within the distance specified by the input value.</i><BR/>
+	
+		<H5>Neighbor</H5>
+		<i>Represents any agents that are nearest neighbors to the agent, that is nominally of distance 1. This function is only relevant in discrete spaces -- grids and networks -- where there are immediate neighboring cells as defined by the geometry of the selection's space.</i><BR/>
+	
+		<H5>Include Self</H5>
+		<i>Specifies whether the agent that we are searching from -- that is, the agent of the selection for this Query Action's selection -- is included in the results of the search.</i><BR/>
+	
+		<H5>Within 2D Boundary</H5>
+		<i>Represents agents or locations that exist within the boundary specified by the inputs.</i><BR/>
+	
+		<H5>Here</H5>
+		<i>Represents the location of the searching agent. For example, if a selection is defined for an agent cell, and that selection's selection's agent is an occupant of a cell, the cell that the agent is occupying will be used. </i><BR/>
+	
+		<H5>Available</H5>
+		<i>Represents cells which are not currently occupied. This function is only relevant for grids which are not multi-occupant.</i><BR/>
+	
+		<H5>Distance</H5>
+		<i>The distance between the source agent and an agent represented by this selection. If more than one agent is represented by the other functions in the selection, this function will the distance to an arbitrary (randomly selected) agent as defined by those other functions.</i><BR/>
+	
+		<H5>Away</H5>
+		<i>Represents a location that is on the path that will take the source agent (that is, the selection's selection's agent) the farthest distance from the agent(s) represented by the search. This function collaborates with the within and neighbor functions to allow the agent to move in a particular direction away from some location or agent.</i><BR/>
+	
+		<H5>Minimize</H5>
+		<i>Finds the agent with the lowest value for the specified input. For example, if we created a Select for HeatCell, created a Minimize Query Term with Heat as the input Query Term, created Neighbor and Available Query Terms and set an Intersect as the target for all of those Queries, the result would be the the neighboring available cell with the lowest heat level.</i><BR/>
+	
+		<H5>Maximize</H5>
+		<i>Finds the agent with the highest value for the specified input. For example, if we created a Select for HeatCell, created a Maximize Query Term with Heat as the input Query Term, created Neighbor and Available Query Terms and set an Intersect as the target for all of those Queries, the result would be the the neighboring available cell with the highest heat level.</i><BR/>
+	
+		<H5>Location 2D</H5>
+		<i>Represents the location of the current agent for use in subsequent selections.</i><BR/>
+	
+		<H5>Boundary 2D</H5>
+		<i>Represents a two-dimensional boundary within a space. (Not currently relevant for any general usages.)</i><BR/>
+	
+		<H5>All</H5>
+		<i>Causes all agents that meet the other query terms to be included in a selection. Without this query term, a single random agent is picked out of all agents matching the query terms.</i><BR/>
+	
+
+	<H3>Random</H3>
+	<i>Random functions are especially significant for agent models. Of particular interest are the weighted membership and random state and boolean value functions. You should be familiar with these functions so that you don't have to create more complex Action flows to accomplish the same thing.
+
+Note that we only have support for uniform distributions as of this release. We're working on a collaborative design for evaluations that allow easy mixing and matching of random functions and distributions.</i><BR/>
+	
+		<H5>Random In Range</H5>
+		<i>A pseudo-random value within that numeric range specified as drawn from a uniform distribution. The minimum values are inclusive. The maximum values are inclusive for integer inputs and exclusive for Real inputs.</i><BR/>
+	
+		<H5>Random To Limit</H5>
+		<i>A pseudo-random value between zero and the value specified by the (non-zero) input and drawn from a uniform range. That value is inclusive for Integers and exclusive for Reals. (Note that as with the random in range function in the context of real numbers the distinction between an exclusive and inclusive limit is essentially meaningless.)</i><BR/>
+	
+		<H5>Random Unit</H5>
+		<i>A pseudo-random Real value between 0 and 1 drawn from a uniform distribution. (The distinction between inclusive and exclusive range is essentially meaningless in this context and we can assume that the result will never be greater or equal to 1.)</i><BR/>
+	
+		<H5>Random Boolean</H5>
+		<i>A value that is randomly true or false, i.e. a fair coin toss.</i><BR/>
+	
+		<H5>Random Weighted</H5>
+		<i>An indexed value weighted against a probability distribution. The total probability must sum to 1.0. For example, an input of {.1,.2,.7} under a uniform distribution would would have 10% probability of producing "0" , 20%  for "1" and 70% for "2". This function can then be used with Item to return a biased result from another list.</i><BR/>
+	
+		<H5>Random Member</H5>
+		<i>Represents a random value drawn from the set of Real values specified.</i><BR/>
+	
+		<H5>Random State</H5>
+		<i>A random specified value (option) from the specified state.</i><BR/>
+	
+
+	<H3>Graphic</H3>
+	<i>Graphic functions are combined within Style Evaluate Actions to determine how to draw an agent within a visualization. One nice aspect of this approach is that the same style definition can be used in multiple places without changing any code. For example, the same style could be used to draw an agent on a two-dimensional grid within Escape, a three-dimensional shape within Escape, a Java Swing based visualization in Ascape, and an XML configured visualizaiton in Repast Simphony.
+
+To define a graphic style for an agent, design a flow in which you create Evaluate Actions for color and shape, and then create an Evaluate Action with the graphic fill or outline function as a target of these.</i><BR/>
+	
+		<H5>Shape Oval</H5>
+		<i>Draw a generic oval.</i><BR/>
+	
+		<H5>Shape Rectangle</H5>
+		<i>Draws a rectangular shape.</i><BR/>
+	
+		<H5>Shape Inset</H5>
+		<i>Shrinks the current shape by the input amount. (The overall scale is currently unspecified, but in most implementations should be 20.)</i><BR/>
+	
+		<H5>Shape Marker</H5>
+		<i>Draw a marker, that is a graphical indicator that can be used to add an additional que about the object state. For example, in a two-dimensional graphics representation this might be a small shape drawn inset at the corner of the larger shape. </i><BR/>
+	
+		<H5>Shape Marker 2</H5>
+		<i>Represents a marker placed in a different location from the other shape markers.</i><BR/>
+	
+		<H5>Shape Marker 3</H5>
+		<i>Represents a marker placed in a different location from the other shape markers.</i><BR/>
+	
+		<H5>Color RGB</H5>
+		<i>A color specified by the three inputs for Red, Green and Blue color components. Those inputs are expected to be in the range 0..1.</i><BR/>
+	
+		<H5>Color Red</H5>
+		<i>The color red.</i><BR/>
+	
+		<H5>Color Yellow</H5>
+		<i>The color yellow.</i><BR/>
+	
+		<H5>Color Blue</H5>
+		<i>The color blue.</i><BR/>
+	
+		<H5>Color Orange</H5>
+		<i>The color orange.</i><BR/>
+	
+		<H5>Color Green</H5>
+		<i>The color green.</i><BR/>
+	
+		<H5>Color Purple</H5>
+		<i>The color purple.</i><BR/>
+	
+		<H5>Color Black</H5>
+		<i>The color black.</i><BR/>
+	
+		<H5>Color White</H5>
+		<i>The color white.</i><BR/>
+	
+		<H5>Color Gray</H5>
+		<i>The color gray.</i><BR/>
+	
+		<H5>Graphic Outline</H5>
+		<i>Draws an outline of the last evaluated shape, using the last specified color or the default color (usually black) if none has been specified.</i><BR/>
+	
+		<H5>Graphic Fill</H5>
+		<i>Fills the last evaluated shape with the last specified color or the default color (usually black) if none has been specified.</i><BR/>
+	
+
+	<H3>Time</H3>
+	<i>Time functions return values related to model execution time. </i><BR/>
+	
+		<H5>Now</H5>
+		<i>The current simulation period, that is the number of iterations that the model has gone through, or in the case of models with callibrarted time, the number of iterations added to the model's nominal start time.</i><BR/>
+	
+
+	<H3>Math</H3>
+	<i>The math functions use the extremely well specified and tested routines form the Java Math library. (Because of copyright restrictions, we aren't able to include the exact definitions here. Click on the links to get more details on each function.)</i><BR/>
+	
+		<H5>Sine</H5>
+		<i></i><BR/>
+	
+		<H5>Cosine</H5>
+		<i></i><BR/>
+	
+		<H5>Tangent</H5>
+		<i></i><BR/>
+	
+		<H5>Arc Sine</H5>
+		<i></i><BR/>
+	
+		<H5>Arc Cosine</H5>
+		<i></i><BR/>
+	
+		<H5>Arc Tangent</H5>
+		<i></i><BR/>
+	
+		<H5>Convert Degree to Radians</H5>
+		<i></i><BR/>
+	
+		<H5>Convert Radians to Degrees</H5>
+		<i></i><BR/>
+	
+		<H5>Exp</H5>
+		<i></i><BR/>
+	
+		<H5>Log</H5>
+		<i></i><BR/>
+	
+		<H5>Log b10</H5>
+		<i></i><BR/>
+	
+		<H5>Square Root</H5>
+		<i></i><BR/>
+	
+		<H5>Cube Root</H5>
+		<i></i><BR/>
+	
+		<H5>Remainder</H5>
+		<i></i><BR/>
+	
+		<H5>Ceiling</H5>
+		<i></i><BR/>
+	
+		<H5>Floor</H5>
+		<i></i><BR/>
+	
+		<H5>Rount</H5>
+		<i></i><BR/>
+	
+		<H5>Arc Tangent Rectangular</H5>
+		<i></i><BR/>
+	
+		<H5>Power</H5>
+		<i></i><BR/>
+	
+		<H5>Absolute Value</H5>
+		<i></i><BR/>
+	
+		<H5>Maximum</H5>
+		<i></i><BR/>
+	
+		<H5>Minimum</H5>
+		<i></i><BR/>
+	
+		<H5>ULP</H5>
+		<i></i><BR/>
+	
+		<H5>Sign</H5>
+		<i></i><BR/>
+	
+		<H5>Hyperbolic Sine</H5>
+		<i></i><BR/>
+	
+		<H5>Hyperbolic Cosine</H5>
+		<i></i><BR/>
+	
+		<H5>Hyperbolic Tan</H5>
+		<i></i><BR/>
+	
+		<H5>Hypotuneuse</H5>
+		<i></i><BR/>
+	
+		<H5>Expm1</H5>
+		<i></i><BR/>
+	
+		<H5>Log1p</H5>
+		<i></i><BR/>
+	
+
+	<H3>List</H3>
+	<i>List functions are used for working with arrays and other functions that have lists as output.</i><BR/>
+	
+		<H5>Item</H5>
+		<i>Returns the item at the specified index from the list of items provided. Those items will typically be input primitives such as Integer or Real values.</i><BR/>
+	
+		<H5>Length</H5>
+		<i>The number of items in the provided list of items.</i><BR/>
+	
+
+	<H3>Distribution</H3>
+	<i>One of the most common tasks in the Agent Modeling process is the creation of agents with particular states drawn from a distribution. For example, you might want to create a number of agents with wealth randomly distributed between some minimum and maximum values. The distribution functions greatly ease the process of setting up those initializations and their associated parameters.</i><BR/>
+	
+		<H5>Uniform Cross Distribution</H5>
+		<i>A random number taken from a distribution of values as defined by a cross of all values. (See Cross Distribution.) This funciton then returns a value drawn from the minimum and maximum values as determined by the current agent state. In the cross distribution, each of the values is treated independently so that an input attribute is created for every potential combination of states.</i><BR/>
+	
+		<H5>Uniform Additive Distribution</H5>
+		<i>A random number taken from a distribution of values in which each of the minimum and maximum values are added to determine a total minimum and maximum value. (See Additive Distribution.) In the additive distribution, each of the values is treated as dependent on the others so that an input attribute is only created for each seperate state.</i><BR/>
+	
+		<H5>Cross Distribution</H5>
+		<i>A value taken from a set of (auto-generated) attributes based on the value of each state included. For example, if the multi-values included a state X with values A and B and a state Y with values I and II, this distribution would create separate input attributes for AI, AII, BI and BII. Then for an agent with States A and II this function would return the value specified by the AII input attribute.</i><BR/>
+	
+		<H5>Additive Distribution</H5>
+		<i>A value taken from a set of (auto-generated) attributes based on the combined values of the states provided. For example, if the multi-values included a state X with values A and B and a state Y with values I and II, this distribution would create input attributes for A, B, I and II. Those values would then be added together, so that for an Agent with state A and II this function would return A + II.</i><BR/>
+	
+
+
+				<P></P>
+					<h2>Parameters</h2>
+						
+		
+				<H5>True  (int, default: true)</H5>
+				<i></i><BR/>
+		
+				<H5>False  (int, default: false)</H5>
+				<i></i><BR/>
+		
+				<H5>Zero  (int, default: 0)</H5>
+				<i>The value 0.</i><BR/>
+		
+				<H5>Unit  (int, default: 1)</H5>
+				<i>The unit value, e.g. 1.</i><BR/>
+		
+				<H5>Path  ([Undefined], default: )</H5>
+				<i></i><BR/>
+		
+				<H5>Self  ([Undefined], default: )</H5>
+				<i></i><BR/>
+		
+
+					<h2><ul>Agents</ul></h2>
+						
+						
+					<H2>Projections</H2>
+					
+		
+
+			    
+				<P>Generated by AMF.</P>
+			</BODY>
+		</HTML>
+	

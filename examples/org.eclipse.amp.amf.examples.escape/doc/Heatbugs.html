@@ -1,0 +1,253 @@
+		<HTML>
+			<HEAD>
+				<TITLE>Heatbugs</TITLE>
+				<STYLE TYPE="text/css">
+					body,
+					html {
+    					margin:0;
+    					padding:0;
+    					
+    					color:#000;
+    				}
+    				body {
+    					min-width:750px;
+    				}
+					#wrap {
+    					
+    					margin:0 auto;
+    					width:1024px;
+    				}
+    				#header {
+    					border-bottom: solid 1px #BEBFAA;   						
+    					left: 220px;
+    				}
+					#nav {
+    					
+    				}
+					#nav ul{
+   						margin:0;
+    					padding:0;
+    					list-style:none;
+    				}
+					#nav li{
+    					display:inline;
+    					margin:0;
+    					padding:0;
+    				}
+    				#main {
+    					border-left: solid 1px #BEBFAA;   						
+    					
+    					float:left;
+    					width:800px;
+    				}
+					#sidebarfake {
+      					float:left;
+    					width:200px;
+    				}
+					#sidebar {
+  						position: fixed;
+      					float:left;
+    					width:200px;
+    				}
+					#footer {
+    					border-top: solid 1px #BEBFAA;   						
+    					
+    					clear:both;
+    				}
+    				
+					#section {
+  						background: #FFFFDC;
+   						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+					#section h1 {
+   						text-align: left;
+   						font-family: sans-serif;
+					}
+					#section p {
+   						text-indent: 2em;
+					}
+					#section p.noindent {
+   						text-indent: 0;
+					}
+					
+					#agent {
+  						border-bottom: solid 1px black;
+   						border-left: solid 1px #BEBFAA;
+   						border-right: solid 1px black;
+   						border-top: solid 1px #BEBFAA;
+   						margin: 2em 1em 1em 2em;
+   						padding: 0.5em 2em 2em 2em;
+   						text-align: justify;
+					}
+
+					#agents {
+						border-bottom: solid 1px black;
+						border-left: solid 1px #BEBFAA;
+						border-right: solid 1px black;
+						border-top: solid 1px #BEBFAA;
+						margin: 2em 1em 1em 2em;
+						padding: 0.5em 2em 2em 2em;
+						text-align: justify;
+					}
+				</STYLE>
+			</HEAD>
+			<BODY>
+			<div id="wrap">
+    			<div id="header">
+    				<H1>Heatbugs</H1>
+					<P></P>
+    			</div>
+    			<div id="sidebarfake">
+    				<H1>   </H1>
+    			</div>
+    			<div id="sidebar">
+			    <ul>
+    					<li><a href="#parlink">Parameters</a></li>
+    					<li><a href="#behaviorlink">Behaviors</a></li>
+    					<li><a href="#agentslink">Agents</a>
+    					<ul>
+    					<li><a href="#heatBuglink">Heat Bug</a></li>
+    					<li><a href="#heatCelllink">Heat Cell</a></li>
+    					</ul></li>
+    					<li><a href="#projlink">Projections</a></li>
+    				</ul>    				
+    			</div>
+    			<div id="main">
+    					<div id="agent">
+
+    					<h3><a name="parlink">Parameters</a></h3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Heat Bug Count</td>
+						<td>Integer</td>
+						<td>100</td></tr>
+					<tr><td colspan="3"><i>The number of heat bugs to create.</i></td></tr></tbody>
+					<tbody ><tr><td>Diffusion Rate</td>
+						<td>Real</td>
+						<td>1.0</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Evaporation Rate</td>
+						<td>Real</td>
+						<td>.01</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Ideal Temperature Draw Minimum</td>
+						<td>Real</td>
+						<td>135</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Ideal Temperature Draw Maximum</td>
+						<td>Real</td>
+						<td>240</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Output Heat Draw Minimum</td>
+						<td>Real</td>
+						<td>23</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Output Heat Draw Maximum</td>
+						<td>Real</td>
+						<td>76</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Maximum Heat</td>
+						<td>Integer</td>
+						<td>340</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+    					<h3><a name="behaviorlink">Behaviors</a></h3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Build Heatbugs</i></td>
+						<td>Build the Heatbugs.</td>
+					</tr>
+		</table>
+						</div>
+    					<div id="agents">
+    					<h1><a name="agentslink">Agents</a></h1>
+								<div id="agent">
+									<H2><a name="heatBuglink"/>Heat Bug</a></H2>
+									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Ideal Temperature</td>
+						<td>Real</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Output Heat</td>
+						<td>Real</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+					<tbody ><tr><td>Unhappiness</td>
+						<td>Real</td>
+						<td>0.0</td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Initialize</i></td>
+						<td>Initialize Initialization. Executed once at the beginning of each model run.</td>
+					</tr>
+					<tr>
+						<td><i>Seek Heat Rule</i></td>
+						<td>Seek Heat Rule Rule. Executed every period.</td>
+					</tr>
+					<tr>
+						<td><i>Initialize State</i></td>
+						<td>Initialize State Initialization. Executed once at the beginning of each model run.</td>
+					</tr>
+					<tr>
+						<td><i>Derive Unhappiness</i></td>
+						<td>Derive Unhappiness.</td>
+					</tr>
+		</table>
+								</div>
+								<div id="agent">
+									<H2><a name="heatCelllink"/>Heat Cell</a></H2>
+									<H3>Attributes</H3>
+		<table CELLPADDING="10px" rules="groups">
+			<thead align="left"><tr><th>Name</th><th>Type</th><th>Default Value</th></tr></thead>
+					<tbody ><tr><td>Heat</td>
+						<td>Real</td>
+						<td></td></tr>
+					<tr><td colspan="3"><i></i></td></tr></tbody>
+		</table>
+									<H3>Behaviors</H3>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Act</th><th>Description</th></tr></thead>
+					<tr>
+						<td><i>Diffuse</i></td>
+						<td>Diffuse.</td>
+					</tr>
+					<tr>
+						<td><i>Watch Heat</i></td>
+						<td>Watch for changes in Heat.</td>
+					</tr>
+		</table>
+								</div>
+						</div>
+					<div id="section">
+						<H2><a name="projlink"/>Projections:</a></H2>
+		<table CELLPADDING="10px">
+			<thead align="left"><tr><th>Name</th><th>Description</th><th>Type</th></tr></thead>
+					<tr>
+						<td><i>Heat Grid</i></td>
+						<td></td>
+						<td>2-Dimensional Grid</td>
+					</tr>
+		</table>
+					</div>			    			
+    			</div>
+			    
+    			<div id="footer">
+					<P>Generated by AMF.</P>
+    			</div>
+			</div>
+			</BODY>
+		</HTML>
+	

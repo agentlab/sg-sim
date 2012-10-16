@@ -1,0 +1,4 @@
+model "|Epidemic.metaabm"
+MinContactTransmissionProbability=0.0
+MaxContactTransmissionProbability=0.0
+StopPeriod=500
