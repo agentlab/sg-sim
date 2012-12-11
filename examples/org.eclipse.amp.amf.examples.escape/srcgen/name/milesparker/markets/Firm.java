@@ -174,9 +174,9 @@ public class Firm extends CellOccupant {
 	 */
 	public List getNetwork() {
 		List network = new ArrayList();
-		network.addAll(((Graph) getMarkets().getFirmInstruments().getSpace())
-				.getNeighborsFor(this));
 		network.addAll(((Graph) getMarkets().getTargetBuyFirms().getSpace())
+				.getNeighborsFor(this));
+		network.addAll(((Graph) getMarkets().getFirmInstruments().getSpace())
 				.getNeighborsFor(this));
 		return network;
 	}
