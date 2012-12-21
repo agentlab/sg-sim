@@ -1,7 +1,7 @@
 package Behaviours;
 
-import jade.core.*;
-import jade.core.behaviours.*;
+import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.*;
 
@@ -20,7 +20,7 @@ public class TestAgentBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

@@ -1,20 +1,20 @@
 package CsAgentForWB;
 
+import Behaviours.TestAgentBehaviour;
 import jade.core.*;
 import jade.content.lang.*;
 import jade.content.lang.sl.*;
 import jade.content.onto.*;
 import Ontologies.*;
-import Behaviours.TestAgentBehaviour;
 
 public class TestAgent extends Agent {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 423062763382794853L;
+	private static final long serialVersionUID = 1L;
 	private Codec codec = new SLCodec();
-	private Ontology ontology = AgentForWbMessageOntology.getInstance();
+	private Ontology ontology = AgentForWbOntology.getInstance();
 
 	public void setup() {    
 		try {
@@ -28,5 +28,5 @@ public class TestAgent extends Agent {
 			System.out.println(e.getMessage());
 		}
 	    
-	}  
+	} 
 }

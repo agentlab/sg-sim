@@ -16,6 +16,8 @@ public class TestAgentRequestInitiatorBehaviour extends AchieveREInitiator {
 		super(a, msg);
 		// TODO Auto-generated constructor stub
 	}
+
+	//поведение инициатора протокола
 	
 	protected void handleInform(ACLMessage inform) {
 		System.out.println("TestAgent recieved INFORM from " + inform.getSender().getName());
@@ -34,6 +36,8 @@ public class TestAgentRequestInitiatorBehaviour extends AchieveREInitiator {
 	}
 	
 	protected void handleAllResultNotifications(Vector notifications) { 					
-	}	
+	}
 
+		// TODO Auto-generated method stub
+		
 }
