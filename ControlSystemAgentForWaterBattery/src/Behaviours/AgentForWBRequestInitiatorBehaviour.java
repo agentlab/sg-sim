@@ -20,18 +20,18 @@ public class AgentForWBRequestInitiatorBehaviour extends AchieveREInitiator {
 	//поведение инициатора протокола
 	
 	protected void handleInform(ACLMessage inform) {
-		System.out.println("TestAgent recieved INFORM from " + inform.getSender().getName());
+		System.out.println("CSAgent recieved INFORM from " + inform.getSender().getName());
 	}
 	
 	protected void handleRefuse(ACLMessage refuse) {
-		System.out.println("TestAgent recieved REFUSE from " + refuse.getSender().getName());
+		System.out.println("CSAgent recieved REFUSE from " + refuse.getSender().getName());
 	}
 	
 	protected void handleFailure(ACLMessage failure) {
 		if(failure.getSender().equals(myAgent.getAMS())) {
 			System.out.println("Failure delivering message");
 		} else {
-			System.out.println("TestAgent recieved FAILURE from " + failure.getSender().getName());
+			System.out.println("CSAgent recieved FAILURE from " + failure.getSender().getName());
 		}
 	}
 	

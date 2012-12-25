@@ -1,14 +1,11 @@
 package Ontologies;
 
-import Ontologies.Message;
-import Ontologies.SendMessage;
+import Ontologies.ActionMessage;
+import Ontologies.SendAction;
 import jade.content.onto.*;
 
 public class AgentForWbOntology extends BeanOntology {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final String ONTOLOGY_NAME = "Control-System-Agent-For-WB-Ontology";
 	private static Ontology instance = new AgentForWbOntology(ONTOLOGY_NAME);
@@ -20,9 +17,10 @@ public class AgentForWbOntology extends BeanOntology {
 		
 		try {
 			
-			add(Message.class);
-			add(SendMessage.class);
-			//add(AnotherAction.class);
+			add(ActionMessage.class);
+			add(SendAction.class);
+			add(PlanMessage.class);
+			add(SendPlan.class);
 		} 
 		
 		catch(OntologyException oe) {

@@ -1,41 +1,31 @@
 package Behaviours;
 
-import java.util.Date;
-import Ontologies.*;
+import Ontologies.ActionMessage;
+import Ontologies.SendAction;
+import Ontologies.SendPlan;
 import jade.content.Concept;
 import jade.content.ContentElement;
-import jade.content.lang.Codec;
-import jade.content.lang.Codec.CodecException;
-import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
-import jade.content.onto.OntologyException;
-import jade.content.onto.UngroundedException;
 import jade.content.onto.basic.Action;
-import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.AMSService;
-import jade.domain.FIPANames;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 
-public class AgentForWbRequestResponderBehaviour extends AchieveREResponder {
+public class TestAgentResponderBehaviour extends AchieveREResponder {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-		
-	public AgentForWbRequestResponderBehaviour(Agent a, MessageTemplate mt) {
+
+	public TestAgentResponderBehaviour(Agent a, MessageTemplate mt) {
 		super(a, mt);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	protected ACLMessage prepareResponse(ACLMessage msg) throws NotUnderstoodException, RefuseException {
 		boolean agreed = false;
 		ContentElement content;
@@ -44,11 +34,11 @@ public class AgentForWbRequestResponderBehaviour extends AchieveREResponder {
 			content = myAgent.getContentManager().extractContent(msg);
 			action = ((Action)content).getAction();
 			
-			if(action instanceof SendPlan) {
-				System.out.println("CS Received SendPlan! All right!");
+			if(action instanceof SendAction) {
+				System.out.println("WB Received SendAction! All right!");
 				agreed = true;
-			} else if (action instanceof SendAction) {
-				System.out.println("CS Received SendAction! What are you doing? >(");
+			} else if (action instanceof SendPlan) {
+				System.out.println("WB Received SendPlan! What are you doing? >(");
 				agreed = false;
 			}
 		} catch (Exception e) {
@@ -72,9 +62,9 @@ public class AgentForWbRequestResponderBehaviour extends AchieveREResponder {
 			content = myAgent.getContentManager().extractContent(msg);
 			action = ((Action)content).getAction();
 			
-			if(action instanceof SendPlan) {
-				System.out.println("Performing SendPlan");
-				this.performSendPlan(msg);
+			if(action instanceof SendAction) {
+				System.out.println("Performing SendAction");
+				this.performSendAction(msg);
 				performed = true;
 				//
 			}
@@ -92,9 +82,21 @@ public class AgentForWbRequestResponderBehaviour extends AchieveREResponder {
 		}
 	}
 	
-	protected void performSendPlan(ACLMessage msg){
-		
-		myAgent.addBehaviour(new AgentForWbTickerBehaviour(myAgent, msg));
+	protected void performSendAction(ACLMessage msg) {
+		//myAgent.addBehaviour(new AgentForWBRequestInitiatorBehaviour(myAgent, msg));
+		ContentElement content;
+		Concept concept = null;
+		ActionMessage action;
+		try {
+			content = myAgent.getContentManager().extractContent(msg);
+			concept = ((Action)content).getAction();
+			SendAction SA = (SendAction) concept;
+			action = SA.getMessage();
+			System.out.println("Recieved action: "+ action.getAction());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
 	}
-
 }
