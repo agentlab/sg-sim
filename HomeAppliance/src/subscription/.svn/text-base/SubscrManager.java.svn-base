@@ -1,0 +1,148 @@
+package subscription;
+
+import jade.content.ContentElement;
+import jade.content.onto.OntologyException;
+import jade.content.onto.UngroundedException;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
+import jade.lang.acl.ACLMessage;
+import jade.proto.SubscriptionResponder.Subscription;
+import jade.proto.SubscriptionResponder.SubscriptionManager;
+import agents.FileSystemMonitorAgent;
+import classes.*;
+import behaviours.FilePollingBehaviour;
+import java.util.Date;
+import java.util.Vector;
+import onto.*;
+
+/**
+ * Обслуживание всех операций по подписке со стороны респондента
+ * После первой регистрации запускается поведение FilePollingBehaviour
+ */
+public class SubscrManager implements SubscriptionManager {
+	private Vector<Subscriber> subscribers = new Vector<Subscriber>(); // Список подписчиков
+	protected FileSystemMonitorAgent myAgent;
+	private FilePollingBehaviour FPB = new FilePollingBehaviour(myAgent, 1000, this); 
+
+
+
+	/**
+	 * Конструктор
+	 */
+	public SubscrManager(FileSystemMonitorAgent agent) {
+		myAgent = agent;
+	}
+
+	/**
+	 * Регистрация подписчика:
+	 * Добавление в список самого подписчика и файла подписки
+	 */
+	public boolean register(Subscription sub) throws RefuseException, NotUnderstoodException {
+		String filePath = null;
+		Date date = null;
+		try {
+			// Распаковка сообщения
+			ContentElement ce = myAgent.getContentManager().extractContent(sub.getMessage());
+			if (ce instanceof SendMessage){
+				SendMessage smsg = (SendMessage) ce;
+				// Извлечение информации о пути к файлу
+				filePath = smsg.getMessage().getFilePath();
+				// Извлечение информации о дате окончания подписки
+				date = smsg.getMessage().getLastDateMod();
+			}
+		} catch (UngroundedException e) {
+			e.printStackTrace();
+		} catch (OntologyException e) {
+			e.printStackTrace();
+		} catch (jade.content.lang.Codec.CodecException e) {
+			e.printStackTrace();
+		} 
+		
+		// Добавление нового подписчика
+		subscribers.add(new Subscriber(sub, filePath, date));
+		// Посылка подписчику сообщения AGREE
+		confirm(sub);
+		// Вывод информации о регистрации подписчика в консоль
+		System.out.println("Agent " + myAgent.getAID().getName() + " registered the agent " + sub.getMessage().getSender().getName());
+		if(subscribers.size() == 1)
+			myAgent.addBehaviour(FPB); // При первом появлении подписчика - добавляется поведение FilePollingBehaviour
+		// Добавление файла в список просмотра файлов
+		FPB.addFolder(filePath);
+		return true; 
+	}
+
+	/**
+	 * Удаление подписчика
+	 */
+	public boolean deregister(Subscription sub) throws FailureException {
+		for (Subscriber subs : subscribers){
+			if (subs.getSub().equals(sub))
+				subscribers.remove(new Subscriber(subs.getSub(), subs.getPath(), subs.getDate()));
+		}
+		// Вывод информации об удалении подписчика
+		System.out.println("Agent " + myAgent.getAID().getName() + " deregistered the agent " + sub.getMessage().getSender().getName());
+		return false;
+	}
+
+	/**
+	 * Вызывается при изменении файла
+	 * Если файл совпадает с файлом подписчика,
+	 * Вызывается метод notify и информация о файле отсылается подписчику
+	 */
+	public void handleChange(Folder folder) {
+		// Поиск среди подписчиков
+		for (Subscriber sub : subscribers) {
+			// Если найден подписчик на измененный файл
+			if (sub.getPath().equals(folder.getPath())){
+				// Если дата подписки не истекла
+				if (sub.getDate().after(folder.getLastDateMod()))
+					// Сообщить подписчику
+					notify(sub.getSub(), folder);
+				else{
+					// Иначе удалить подписчика из списка
+					subscribers.remove(new Subscriber(sub.getSub(), sub.getPath(), sub.getDate()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Отправление сообщения подписчику
+	 */
+	private void notify(Subscription sub, Folder folder) {
+		try {
+			ACLMessage notification = new ACLMessage(ACLMessage.INFORM); // Новое сообщение 			
+			notification.setLanguage(myAgent.getCodec().getName()); // Установка языка
+			notification.setOntology(myAgent.getOntology().getName()); // Установка онтологии
+			// Создание контекста сообщения
+			Message msg = new Message();
+			msg.setFilePath(folder.getPath()); // Путь к файлу
+			msg.setLastDateMod(folder.getLastDateMod()); // Дата последнего изменения	
+			SendMessage smsg = new SendMessage();
+			smsg.setMessage(msg);
+			myAgent.getContentManager().fillContent(notification, smsg); // Создание сообщения с помощью ContentManager 
+			sub.notify(notification); // Отправка сообщения
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+	}
+
+	/**
+	 * Посылка подписчику сообщения AGREE 
+	 */
+	private void confirm(Subscription sub) {
+		try {
+			ACLMessage notification = sub.getMessage().createReply();
+			notification.setPerformative(ACLMessage.AGREE);
+			// Отправка сообщения подписчику
+			sub.notify(notification);
+			// Вывод сообщения о согласии в консоль
+			System.out.println("Agent " + myAgent.getAID().getName() + " sent AGREE message to the agent " + sub.getMessage().getSender().getName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

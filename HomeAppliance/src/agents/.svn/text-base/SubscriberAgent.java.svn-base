@@ -1,0 +1,107 @@
+package agents;
+
+import onto.MessageOntology;
+import jade.content.lang.Codec;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.Ontology;
+import jade.core.Agent;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+
+import behaviours.RegisterBehaviour;
+
+/**
+ * Агент подписывается на получение информации от другого агнта
+ * Имеет два поведения: RegisterBehaviour и StubscriptionInitiator 
+ */
+public class SubscriberAgent extends Agent {
+	
+	private static final long serialVersionUID = -2961241167339514488L;
+	private String path;
+	
+	protected final String name = "SubscriberAgent"; // Имя агента на сервисе желтых страниц
+	protected final String type = "TestAgent"; // Тип агента на сервисе желтых страниц
+	
+	private Codec codec = new SLCodec(); // Кодек
+	private Ontology ontology = MessageOntology.getInstance(); //Онтология
+
+	/**
+	 * Инициализация
+	 */
+	@Override
+	protected void setup() {
+		System.out.println(getAID().getName() + " started.");
+		
+		Object[] args = getArguments();
+		if (args != null && args.length > 0){
+			this.setPath((String)args[0]);
+		}
+		else{
+			System.out.println("No path");
+		}
+		
+		getContentManager().registerLanguage(codec); // Регистрация кодека для ContentManager
+		getContentManager().registerOntology(ontology); // Регистрация языка для ContentManager
+		
+		// Регистрация сервиса на желтых страницах
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(type);
+		sd.setName(name);
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+		try {
+			DFService.register(this, dfd);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		subscribe();
+		// Вывод приветствия в консоль
+		System.out.println("Agent " + getAID().getName() + " is ready.");
+	}
+
+	/**
+	 * Подписка к первому найденому на сервисе желтых страниц
+	 * агенту-респонденту
+	 */
+	protected void subscribe() {
+		// Создание шаблона для поиска
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("MonitorAgent");
+		sd.setName("FileSystemMonitorAgent");
+		DFAgentDescription template = new DFAgentDescription();
+		template.addServices(sd);	
+		addBehaviour(new RegisterBehaviour(template, this, 1000)); // Запуск поведения - подписки
+	}
+
+	@Override
+	protected void takeDown() {
+		System.out.println("Agent " + getLocalName() + " is shutting down.");
+	}
+	
+	/**
+	 * 	Метод возвращает кодек
+	 */
+	public Codec getCodec()
+	{
+		return this.codec;
+	}
+	
+	/**
+	 * 	Метод возвращает онтологию
+	 */
+	public Ontology getOntology()
+	{
+		return this.ontology;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getPath() {
+		return path;
+	}
+}

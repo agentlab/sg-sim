@@ -1,0 +1,53 @@
+package classes;
+
+import java.io.File;
+import java.util.Date;
+
+/**
+ * Класс хранит информацию о файле:
+ * 	Сам файл
+ * 	Дату последнего считанного изменения
+ * 	Путь к файлу
+ */
+public class Folder {
+	private File file;
+	private Date lastDateMod;
+	private String path;
+
+	/**
+	 * Метод возвращает файл
+	 */
+	public File getFile() {
+		return file;
+	}
+	
+	/**
+	 * Метод устанавливает дату последнего изменения
+	 */
+	public void setLastDateMod(Date lastDateMod) {
+		this.lastDateMod.setTime(lastDateMod.getTime());
+	}
+	
+	/**
+	 * Метод возвращает даты последнего изменения
+	 */
+	public Date getLastDateMod() {
+		return lastDateMod;
+	}
+	
+	/**
+	 * Метод возвращает путь к файлу
+	 */
+	public String getPath(){
+		return this.path;
+	}
+	
+	/**
+	 * Конструктор
+	 */
+	public Folder(String path) {
+		this.path = path;
+		this.file = new File(path);
+		this.lastDateMod = new Date(file.lastModified());
+	}
+}

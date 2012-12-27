@@ -1,0 +1,44 @@
+package onto;
+
+import jade.content.Concept;
+import java.util.Date;
+
+/**
+ * Класс для создания контекста сообщений
+ */
+public class Message implements Concept{
+
+	private static final long serialVersionUID = -4331343106987983326L;
+	
+	// В сообщении можно передать строку и дату
+	private String filePath; 
+	private Date lastDateMod;
+	
+	/**
+	 * Метод устанавливает значение строки
+	 */
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	/**
+	 * Метод возвращает значение строки
+	 */
+	public String getFilePath() {
+		return filePath;
+	}
+	
+	/**
+	 * Метод устанавливает дату
+	 */
+	public void setLastDateMod(Date lastDateMod) {
+		this.lastDateMod = lastDateMod;
+	}
+	
+	/**
+	 * Метод возвращает дату
+	 */
+	public Date getLastDateMod() {
+		return lastDateMod;
+	}
+}

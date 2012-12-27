@@ -1,0 +1,18 @@
+package onto;
+
+import jade.content.*;	//AgentAction 
+
+public class SendMessage implements Predicate{
+
+	private static final long serialVersionUID = 6876274843885978495L;
+	
+	private Message message;
+	
+	public Message getMessage() {
+		return this.message;
+	}
+	
+	public void setMessage(Message msg) {
+		this.message = msg;
+	}
+}

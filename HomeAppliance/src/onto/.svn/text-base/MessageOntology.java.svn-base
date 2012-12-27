@@ -1,0 +1,30 @@
+package onto;
+
+import jade.content.onto.*;
+
+/**
+ * Класс онтологии сообщений
+ */
+public class MessageOntology extends BeanOntology {
+	public static final String ONTOLOGY_NAME = "MessageOntology"; // Имя онтологии
+	private static Ontology instance = new MessageOntology(ONTOLOGY_NAME);
+	public static Ontology getInstance() { return instance; }
+
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Конструктор
+	 */
+	private MessageOntology(String name) {
+		super(name);
+		
+		try {
+			add(Message.class);
+			add(SendMessage.class);
+		} 
+		
+		catch(OntologyException oe) {
+			oe.printStackTrace(); 
+		}
+	}
+}
