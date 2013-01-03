@@ -15,20 +15,20 @@ public class HPSblockControlAction implements AgentAction {
 	}
 	//
 	private double power;
-	private ControlType acttype;
+	private ControlType actionType;
 	private int num;
 	
 	public HPSblockControlAction() {
-		this.acttype=ControlType.Action1;
+		this.actionType=ControlType.Action1;
 		this.power=0;
 	}
-
-	public ControlType getcType() {
-		return acttype;
+	
+	public ControlType getActionType() {
+		return actionType;
 	}
 
-	public void setcType(ControlType cType) {
-		this.acttype = cType;
+	public void setActionType(ControlType actionType) {
+		this.actionType = actionType;
 	}
 
 	public double getPower() {

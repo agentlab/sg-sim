@@ -47,7 +47,7 @@ public class ControlCommandsSubscriptionInitiator extends SubscriptionInitiator 
 				HPSblockControlAction ca=(HPSblockControlAction)a.getAction();
 				System.out.println("Control Action has been recieved by agent "+myAgent.getName());
 				//do nothing, just print parameters
-				System.out.println("Action type: "+ca.getcType());
+				System.out.println("Action type: "+ca.getActionType());
 				System.out.println("Power: "+ca.getPower());
 			}
 			

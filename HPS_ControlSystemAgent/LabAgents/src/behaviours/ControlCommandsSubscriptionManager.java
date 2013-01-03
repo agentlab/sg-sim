@@ -79,7 +79,7 @@ public class ControlCommandsSubscriptionManager implements SubscriptionManager {
 			try {
 				HPSblockControlAction result = new HPSblockControlAction();
 				result.setPower(500*Math.random());
-				result.setcType(ControlType.Action2);
+				result.setActionType(ControlType.Action2);
 				result.setNum((int)Math.round(100*Math.random()));
 				Action act=new Action();
 				act.setActor(s.getMessage().getSender());
