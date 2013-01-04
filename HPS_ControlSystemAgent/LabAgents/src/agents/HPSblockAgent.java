@@ -29,6 +29,7 @@ public class HPSblockAgent extends Agent {
 	private static final long serialVersionUID = 3716704426673119046L;
 	private Subscription resultSubscription;
 	private OneHourResultSubscriptionManager subMngr;
+	
 	protected void setup(){
 		/**
 		 * initialize agent
@@ -134,5 +135,4 @@ public class HPSblockAgent extends Agent {
 	public void setSubMngr(OneHourResultSubscriptionManager subMngr) {
 		this.subMngr = subMngr;
 	}
-	
 }

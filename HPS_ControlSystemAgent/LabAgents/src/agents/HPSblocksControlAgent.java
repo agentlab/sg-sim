@@ -3,12 +3,14 @@ package agents;
 
 import ontology.*;
 import behaviours.ControlCommandsSubscriptionManager;
-import behaviours.OneHourResultSubscriptionManager;
+import behaviours.OneDayResultSubscriptionManager;
+import behaviours.PPRequestResponder;
 import behaviours.SearchBlocksBehaviour;
 import jade.content.lang.sl.SLCodec;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
@@ -25,24 +27,28 @@ public class HPSblocksControlAgent extends Agent {
 	 */
 	private static final long serialVersionUID = -9098546390730798576L;
 	
-	private double currentPower; //power being generated
-	private double maxPower; //maximum Power
-	private Vector<HPSblockDescriptor> blocks = new Vector<HPSblockDescriptor>(); 		// Controlled blocks list
-	private Vector<Subscription> ccSubscription= new Vector<Subscription>();
-	private ControlCommandsSubscriptionManager ccSubMngr;
+	private Vector<HPSblockDescriptor> blocks = new Vector<HPSblockDescriptor>(); 		// Controlled HPS blocks parameters
+	private Vector<Subscription> ccSubscription= new Vector<Subscription>();			// HPS blocks subscriptions for control commands
+	private ControlCommandsSubscriptionManager ccSubMngr;								// SubMngr for control commands
+	private OneDayResultSubscriptionManager odrSubMngr;									// SubMngr for one day results
+	private Subscription odrSubscription;												// Power producer subscription for one day results
+	private HPSDescriptor myParams;														// Descriptor of HPS parameters
+	private PowerPlan curDayResult;														// Current day generated power
+	private PowerPlan nextDayPlan;														// Next day power plan
 	
 	protected void setup(){
 		/**
 		 * initialize agent
 		 */
 				
-		System.out.println("Hello, the GPSBcontrol agent "+getAID().getLocalName()+" is started");
+		System.out.println("Hello, the HPSblocksControl agent "+getAID().getLocalName()+" is started");
 		
 		//register language and ontology
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(HPSOntology.getInstance());
+		this.getContentManager().registerOntology(PowerProducerOntology.getInstance());
 		
-		//Registering service on yellow pages
+		//Registering services on yellow pages
 		ServiceDescription sd= new ServiceDescription();
 		sd.setType("power-generators-control");
 		sd.setName("hpsController");
@@ -52,17 +58,30 @@ public class HPSblocksControlAgent extends Agent {
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		//add serach blocks behaviour (oneShotBehaviour)
 		this.addBehaviour(new SearchBlocksBehaviour());
-		//adding the subscription responder
+
+		//adding the control commands subscription responder
 		this.ccSubMngr = new ControlCommandsSubscriptionManager(this);
-		MessageTemplate mt = SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE);
-		SubscriptionResponder ccSubResponder = new SubscriptionResponder(this, mt, this.ccSubMngr);
+		MessageTemplate ccMT = MessageTemplate.and(SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE),MessageTemplate.MatchOntology(HPSOntology.getInstance().getName()));
+		SubscriptionResponder ccSubResponder = new SubscriptionResponder(this, ccMT, this.ccSubMngr);
 		this.addBehaviour(ccSubResponder);
+		
+		//adding the request responder for Power Producer request
+		System.out.println("Agent "+getLocalName()+" waiting for requests...");
+	  	MessageTemplate template = MessageTemplate.and(
+	  	MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST),
+	  	MessageTemplate.MatchPerformative(ACLMessage.REQUEST));	
+	  	this.addBehaviour(new PPRequestResponder(this, template));
+	  	
+	  	//adding one day result subscription responder
+	  	this.odrSubMngr= new OneDayResultSubscriptionManager(this);
+	  	MessageTemplate odrMT=MessageTemplate.and(SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE),MessageTemplate.MatchOntology(PowerProducerOntology.getInstance().getName()));
+	  	SubscriptionResponder odrSubResponder = new SubscriptionResponder(this, odrMT, this.odrSubMngr);
+	  	this.addBehaviour(odrSubResponder);
 	}
 	
 	public void addBlock(HPSblockDescriptor hpsBlock){
@@ -100,6 +119,30 @@ public class HPSblocksControlAgent extends Agent {
 	public void addCcsubscription(Subscription s){
 		this.ccSubscription.add(s);
 	}
+	
+	public HPSDescriptor getMyParams() {
+		return myParams;
+	}
+
+	public void setMyParams(HPSDescriptor myParams) {
+		this.myParams = myParams;
+	}
+	
+	public Subscription getOdrSubscription() {
+		return odrSubscription;
+	}
+
+	public void setOdrSubscription(Subscription odrSubscription) {
+		this.odrSubscription = odrSubscription;
+	}
+
+	public PowerPlan getCurDayResult() {
+		return curDayResult;
+	}
+
+	public void setCurDayResult(PowerPlan curDayResult) {
+		this.curDayResult = curDayResult;
+	}
 
 	protected void takeDown(){
 		/**
@@ -109,12 +152,9 @@ public class HPSblocksControlAgent extends Agent {
 		try {
 			DFService.deregister(this);
 		} catch (FIPAException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//Printing goodbye message
-		System.out.println("The GPSBcontrol agent "+getAID().getLocalName()+" is terminated");
-	}
-	
-
+		System.out.println("The HPSblocsControl agent "+getAID().getLocalName()+" is terminated");
+	}	
 }
