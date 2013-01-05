@@ -1,6 +1,11 @@
 package behaviours;
 
+import internalClasses.BlockPowerPlan;
+
+import java.util.Date;
 import java.util.Vector;
+
+import agents.HPSblocksControlAgent;
 
 import ontology.OneHourResult;
 
@@ -20,16 +25,14 @@ public class OneHourResultSubscriptionInitiator extends SubscriptionInitiator {
 	/**
 	 * Behavior for HPS block controller agent
 	 */
+	private static final Vector<BlockPowerPlan> blockPlans=new Vector<BlockPowerPlan>();
+	
 	public OneHourResultSubscriptionInitiator(Agent a, ACLMessage msg) {
 		super(a, msg);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
 	protected void handleRefuse(ACLMessage refuse) {
-		/**
-		 * 
-		 */
 		System.out.println("Warning. Agent "+refuse.getSender().getName()+" refused subscription.");
 	}
 	@Override
@@ -42,28 +45,70 @@ public class OneHourResultSubscriptionInitiator extends SubscriptionInitiator {
 			if(ce instanceof OneHourResult){
 				//process recieved result from the block
 				OneHourResult res=(OneHourResult)ce;
-				System.out.println("Agent "+inform.getSender().getName()+" generated "+((OneHourResult)ce).getPower()+" at "+((OneHourResult)ce).getDate());
-				System.out.println("Generated power by agent "+inform.getSender().getLocalName()+" is "+res.getPower());
+				System.out.println(myAgent.getLocalName()+": result recieved from "+inform.getSender().getLocalName()+" at "+((OneHourResult)ce).getDate());
+				System.out.println(myAgent.getLocalName()+": generated power by agent "+inform.getSender().getLocalName()+" : "+res.getPower());
+				if(!checkId(inform.getSender())){
+					//add sender to the blockPlans
+					blockPlans.add(new BlockPowerPlan(inform.getSender()));
+				}
+				addResult2Plan(inform.getSender(),res.getPower());
+				if(checkPlanLength()){
+					for(BlockPowerPlan bp:blockPlans)bp.i=0;
+					//get the resulting plan and call notify for PowerProducer
+					double sum;
+					for(int k=0;k<24;k++){
+						sum=0;
+						for(BlockPowerPlan bp:blockPlans){
+							sum+=bp.plan[k];
+						}
+						((HPSblocksControlAgent)myAgent).getCurDayResult().setPower(sum, k);
+					}
+					((HPSblocksControlAgent)myAgent).getCurDayResult().setDate(new Date());
+					//calling notify method
+					((HPSblocksControlAgent)myAgent).getOdrSubMngr().notify((HPSblocksControlAgent) myAgent);
+				}
 			}
 			
 		} catch (UngroundedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CodecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OntologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 	@Override
-	protected void handleAllResponses(Vector responses){
+	protected void handleAllResponses(@SuppressWarnings("rawtypes") Vector responses){
 		System.out.println(responses.size()+" responces have been recieved");
 	}
 	@Override
 	public void cancel(AID reciever, boolean ignoreResponse){
 		System.out.println("Subscription "+this.getClass()+" has been canceled by "+reciever.getName());
 	}
-
+	private boolean checkId(AID id){
+		boolean result=false;
+		for(BlockPowerPlan bp:blockPlans){
+			if(bp.blockId.equals(id)) result=true;
+		}
+		return result;
+	}
+	
+	private void addResult2Plan(AID sender, double power) {
+		for(BlockPowerPlan bp:blockPlans){
+			if(bp.blockId.equals(sender)){
+				bp.plan[bp.i]=power;
+				bp.i++;
+				return;
+			}
+		}
+	}
+	private boolean checkPlanLength() {
+		for(BlockPowerPlan bp:blockPlans){
+			if(bp.i!=24){
+				return false;
+			}
+		}
+		return true;
+	}
 }

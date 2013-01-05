@@ -27,13 +27,9 @@ public class OneDayResultSubscriptionManager implements SubscriptionManager {
 		boolean result=false;
 		if(s.getMessage().getContent().equalsIgnoreCase("one-day-result-subscription")){
 			controller.setOdrSubscription(s);
-			System.out.println("Agent "+controller.getLocalName()+" has received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
-			/**
-			 * TO DO//INITIATE ONE DAY RESULT NOTIFICATIONS
-			 */
+			System.out.println(controller.getLocalName()+": received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
 			result=true;
 		}
-		// TODO Auto-generated method stub
 		return result;
 	}
 	
@@ -52,10 +48,8 @@ public class OneDayResultSubscriptionManager implements SubscriptionManager {
 			a.getContentManager().fillContent(notification, a.getCurDayResult());
 			a.getOdrSubscription().notify(notification); 
 		} catch (CodecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OntologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 	}

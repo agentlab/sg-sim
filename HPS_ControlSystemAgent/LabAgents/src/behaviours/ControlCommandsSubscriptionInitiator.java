@@ -11,6 +11,8 @@ import jade.proto.SubscriptionInitiator;
 
 import java.util.Vector;
 
+import agents.HPSblockAgent;
+
 import ontology.HPSblockControlAction;
 
 
@@ -25,7 +27,6 @@ public class ControlCommandsSubscriptionInitiator extends SubscriptionInitiator 
 	 */
 	public ControlCommandsSubscriptionInitiator(Agent a, ACLMessage msg) {
 		super(a, msg);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -45,25 +46,25 @@ public class ControlCommandsSubscriptionInitiator extends SubscriptionInitiator 
 			if(a.getAction() instanceof HPSblockControlAction){
 				//process recieved result from the block
 				HPSblockControlAction ca=(HPSblockControlAction)a.getAction();
-				System.out.println("Control Action has been recieved by agent "+myAgent.getName());
+				System.out.println(myAgent.getLocalName()+": control action has been recieved.");
 				//do nothing, just print parameters
-				System.out.println("Action type: "+ca.getActionType());
-				System.out.println("Power: "+ca.getPower());
+				System.out.println(myAgent.getLocalName()+": action type: "+ca.getActionType()+" Power: "+ca.getPower());
+				((HPSblockAgent)myAgent).setNextHourAction(ca);
+				if(((HPSblockAgent)myAgent).isFirstCommand()){
+					((HPSblockAgent)myAgent).setFirstCommand(false);
+				}
 			}
 			
 		} catch (UngroundedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CodecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OntologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	@Override
-	protected void handleAllResponses(Vector responses){
+	protected void handleAllResponses(@SuppressWarnings("rawtypes") Vector responses){
 		System.out.println(responses.size()+" responces have been recieved");
 	}
 	@Override

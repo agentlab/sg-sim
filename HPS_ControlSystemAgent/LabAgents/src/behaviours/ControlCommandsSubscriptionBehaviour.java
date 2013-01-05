@@ -28,9 +28,8 @@ public class ControlCommandsSubscriptionBehaviour extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
 		//prepare initiator and run it
-		System.out.println("Subscribing to the controller: "+this.responder);
+		System.out.println(block.getLocalName()+": subscribing to the controller: "+this.responder);
 		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
 		subscribe.setLanguage(new SLCodec().getName());
 		subscribe.setOntology(HPSOntology.getInstance().getName());

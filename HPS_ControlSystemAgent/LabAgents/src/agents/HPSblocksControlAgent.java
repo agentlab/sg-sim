@@ -7,6 +7,7 @@ import behaviours.OneDayResultSubscriptionManager;
 import behaviours.PPRequestResponder;
 import behaviours.SearchBlocksBehaviour;
 import jade.content.lang.sl.SLCodec;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -32,9 +33,13 @@ public class HPSblocksControlAgent extends Agent {
 	private ControlCommandsSubscriptionManager ccSubMngr;								// SubMngr for control commands
 	private OneDayResultSubscriptionManager odrSubMngr;									// SubMngr for one day results
 	private Subscription odrSubscription;												// Power producer subscription for one day results
-	private HPSDescriptor myParams;														// Descriptor of HPS parameters
-	private PowerPlan curDayResult;														// Current day generated power
-	private PowerPlan nextDayPlan;														// Next day power plan
+	private HPSDescriptor myParams=new HPSDescriptor();									// Descriptor of HPS parameters
+	private PowerPlan curDayResult=new PowerPlan();														// Current day generated power
+	private PowerPlan nextDayPlan=new PowerPlan();														// Next day power plan
+	private PowerPlan currDayPlan=new PowerPlan();
+	private boolean dayPlanRcvd=false;
+	private boolean todayPlanExecuted=true;
+	public DFAgentDescription dfd=new DFAgentDescription();
 	
 	protected void setup(){
 		/**
@@ -42,7 +47,7 @@ public class HPSblocksControlAgent extends Agent {
 		 */
 				
 		System.out.println("Hello, the HPSblocksControl agent "+getAID().getLocalName()+" is started");
-		
+		myParams.setHpsId(this.getAID());
 		//register language and ontology
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(HPSOntology.getInstance());
@@ -52,11 +57,10 @@ public class HPSblocksControlAgent extends Agent {
 		ServiceDescription sd= new ServiceDescription();
 		sd.setType("power-generators-control");
 		sd.setName("hpsController");
-		DFAgentDescription dfd= new DFAgentDescription();
-		dfd.setName(getAID());
-		dfd.addServices(sd);
+		this.dfd.setName(getAID());
+		this.dfd.addServices(sd);
 		try {
-			DFService.register(this, dfd);
+			DFService.register(this, this.dfd);
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
@@ -64,14 +68,8 @@ public class HPSblocksControlAgent extends Agent {
 		//add serach blocks behaviour (oneShotBehaviour)
 		this.addBehaviour(new SearchBlocksBehaviour());
 
-		//adding the control commands subscription responder
-		this.ccSubMngr = new ControlCommandsSubscriptionManager(this);
-		MessageTemplate ccMT = MessageTemplate.and(SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE),MessageTemplate.MatchOntology(HPSOntology.getInstance().getName()));
-		SubscriptionResponder ccSubResponder = new SubscriptionResponder(this, ccMT, this.ccSubMngr);
-		this.addBehaviour(ccSubResponder);
-		
 		//adding the request responder for Power Producer request
-		System.out.println("Agent "+getLocalName()+" waiting for requests...");
+		System.out.println(getLocalName()+": waiting for requests.");
 	  	MessageTemplate template = MessageTemplate.and(
 	  	MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST),
 	  	MessageTemplate.MatchPerformative(ACLMessage.REQUEST));	
@@ -128,6 +126,14 @@ public class HPSblocksControlAgent extends Agent {
 		this.myParams = myParams;
 	}
 	
+	public OneDayResultSubscriptionManager getOdrSubMngr() {
+		return odrSubMngr;
+	}
+
+	public void setOdrSubMngr(OneDayResultSubscriptionManager odrSubMngr) {
+		this.odrSubMngr = odrSubMngr;
+	}
+
 	public Subscription getOdrSubscription() {
 		return odrSubscription;
 	}
@@ -144,6 +150,46 @@ public class HPSblocksControlAgent extends Agent {
 		this.curDayResult = curDayResult;
 	}
 
+	public PowerPlan getNextDayPlan() {
+		return nextDayPlan;
+	}
+
+	public void setNextDayPlan(PowerPlan nextDayPlan) {
+		this.nextDayPlan = nextDayPlan;
+	}	
+
+	public boolean isDayPlanRcvd() {
+		return dayPlanRcvd;
+	}
+
+	public void setDayPlanRcvd(boolean dayPlanRcvd) {
+		this.dayPlanRcvd = dayPlanRcvd;
+	}
+
+	public PowerPlan getCurrDayPlan() {
+		return currDayPlan;
+	}
+
+	public void setCurrDayPlan(PowerPlan currDayPlan) {
+		this.currDayPlan = currDayPlan;
+	}
+
+	public boolean isTodayPlanExecuted() {
+		return todayPlanExecuted;
+	}
+
+	public void setTodayPlanExecuted(boolean todayPlanExecuted) {
+		this.todayPlanExecuted = todayPlanExecuted;
+	}
+	
+	public int getBlockIndex(AID blockID){
+		int result=-1;
+		for(HPSblockDescriptor d:this.blocks){
+			if(d.getId().equals(blockID)) result=this.blocks.indexOf(d);
+		}
+		return result;
+	}
+
 	protected void takeDown(){
 		/**
 		 * terminating agent
@@ -156,5 +202,5 @@ public class HPSblocksControlAgent extends Agent {
 		}
 		//Printing goodbye message
 		System.out.println("The HPSblocsControl agent "+getAID().getLocalName()+" is terminated");
-	}	
+	}
 }

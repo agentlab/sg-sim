@@ -10,19 +10,25 @@ public class HPSblockControlAction implements AgentAction {
 	
 	private static final long serialVersionUID = 5892880655358501431L;
 	public static enum ControlType{
-		Action1,
-		Action2
+		Stop,
+		Start,
+		SetPower,
+		NoAction
 	}
 	//
 	private double power;
 	private ControlType actionType;
-	private int num;
 	
 	public HPSblockControlAction() {
-		this.actionType=ControlType.Action1;
+		this.actionType=ControlType.Stop;
 		this.power=0;
 	}
 	
+	public HPSblockControlAction(double power, ControlType actionType) {
+		this.power = power;
+		this.actionType = actionType;
+	}
+
 	public ControlType getActionType() {
 		return actionType;
 	}
@@ -37,13 +43,5 @@ public class HPSblockControlAction implements AgentAction {
 
 	public void setPower(double power) {
 		this.power = power;
-	}
-
-	public int getNum() {
-		return num;
-	}
-
-	public void setNum(int num) {
-		this.num = num;
 	}
 }

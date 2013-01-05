@@ -3,6 +3,7 @@ package agents;
 import behaviours.ControlCommandsSubscriptionBehaviour;
 import behaviours.OneHourResultSubscriptionManager;
 import ontology.*;
+import ontology.HPSblockDescriptor.BlockState;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
@@ -25,10 +26,14 @@ public class HPSblockAgent extends Agent {
 	/**
 	 * 
 	 */
-	private HPSblockDescriptor params=new HPSblockDescriptor(null, 100*Math.random(), 1000*Math.random(),  "passive", 0);;
+	private HPSblockDescriptor params=new HPSblockDescriptor(null, 100+10*(Math.random()-0.5), 1000+100*(Math.random()-0.5),  BlockState.Passive);
 	private static final long serialVersionUID = 3716704426673119046L;
 	private Subscription resultSubscription;
 	private OneHourResultSubscriptionManager subMngr;
+	private HPSblockControlAction currentAction=new HPSblockControlAction();
+	private HPSblockControlAction nextHourAction=new HPSblockControlAction();
+	private boolean firstCommand=true;
+	private boolean startResultNotification=false;
 	
 	protected void setup(){
 		/**
@@ -37,6 +42,7 @@ public class HPSblockAgent extends Agent {
 		
 		System.out.println("Hello, the HPSblock agent "+getAID().getLocalName()+" is started");
 		params.setId(getAID());
+		System.out.printf("%s: minPower: %.2f; maxPower: %.2f\n",getLocalName(),params.getMinP(),params.getMaxP());
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(HPSOntology.getInstance());
 				
@@ -50,12 +56,11 @@ public class HPSblockAgent extends Agent {
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 				
 		//adding the request responder behavior
-		System.out.println("Agent "+getLocalName()+" waiting for requests...");
+		System.out.println(getLocalName()+": waiting for requests.");
 	  	MessageTemplate template = MessageTemplate.and(
 	  	MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST),
 	  	MessageTemplate.MatchPerformative(ACLMessage.REQUEST));	  	
@@ -67,9 +72,14 @@ public class HPSblockAgent extends Agent {
 			private static final long serialVersionUID = 3224171302554807976L;
 
 			protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
-				System.out.println("Agent "+getLocalName()+": REQUEST received from "+request.getSender().getName()+". Action is "+request.getContent());
+				System.out.println(getLocalName()+": REQUEST received from "+request.getSender().getLocalName()+". Action is "+request.getContent());
 				if (request.getContent().equalsIgnoreCase("params-request")) {
 					//do not send agree message, reply with inform	
+					//adding the subscription responder
+					((HPSblockAgent)myAgent).subMngr = new OneHourResultSubscriptionManager((HPSblockAgent)myAgent);
+					MessageTemplate mt = SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE);
+					SubscriptionResponder subResponder = new SubscriptionResponder(myAgent, mt, ((HPSblockAgent)myAgent).subMngr);
+					myAgent.addBehaviour(subResponder);
 					return null;
 				}
 				else {
@@ -81,7 +91,7 @@ public class HPSblockAgent extends Agent {
 				
 			
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
-					System.out.println("Agent "+getLocalName()+": Replying with parameter");
+					System.out.println(getLocalName()+": Replying with parameters");
 					ACLMessage inform = request.createReply();
 					inform.setPerformative(ACLMessage.INFORM);
 					//send block parameters
@@ -90,21 +100,15 @@ public class HPSblockAgent extends Agent {
 						//subscribing to the controller for commands
 						myAgent.addBehaviour(new ControlCommandsSubscriptionBehaviour((HPSblockAgent)myAgent,request.getSender()));
 					} catch (CodecException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (OntologyException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
 					return inform;	
 			}
 			} );
-		//adding the subscription responder
-		this.subMngr = new OneHourResultSubscriptionManager(this);
-		MessageTemplate mt = SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE);
-		SubscriptionResponder subResponder = new SubscriptionResponder(this, mt, this.subMngr);
-		this.addBehaviour(subResponder);
+		
 	}
 	public HPSblockDescriptor getParams(){
 		return this.params;
@@ -134,5 +138,29 @@ public class HPSblockAgent extends Agent {
 	}
 	public void setSubMngr(OneHourResultSubscriptionManager subMngr) {
 		this.subMngr = subMngr;
+	}
+	public HPSblockControlAction getCurrentAction() {
+		return currentAction;
+	}
+	public void setCurrentAction(HPSblockControlAction currentAction) {
+		this.currentAction = currentAction;
+	}
+	public HPSblockControlAction getNextHourAction() {
+		return nextHourAction;
+	}
+	public void setNextHourAction(HPSblockControlAction nextHourAction) {
+		this.nextHourAction = nextHourAction;
+	}
+	public boolean isFirstCommand() {
+		return firstCommand;
+	}
+	public void setFirstCommand(boolean firstCommand) {
+		this.firstCommand = firstCommand;
+	}
+	public boolean isStartResultNotification() {
+		return startResultNotification;
+	}
+	public void setStartResultNotification(boolean startResultNotification) {
+		this.startResultNotification = startResultNotification;
 	}
 }

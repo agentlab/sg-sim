@@ -34,4 +34,7 @@ public class PowerPlan implements Predicate {
 	public void setDate(Date date) {
 		this.date = date;
 	}
+	public void setPower(double p, int i){
+		this.plan[i]=p;
+	}
 }

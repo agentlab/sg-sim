@@ -1,6 +1,5 @@
 package behaviours;
 
-import agents.HPSblockAgent;
 import agents.HPSblocksControlAgent;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
@@ -23,7 +22,7 @@ public class PPRequestResponder extends AchieveREResponder {
 		this.controller=(HPSblocksControlAgent)a;
 	}
 	protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
-		System.out.println("Agent "+controller.getLocalName()+": REQUEST received from "+request.getSender().getName()+". Action is "+request.getContent());
+		System.out.println(controller.getLocalName()+": REQUEST received from "+request.getSender().getName()+". Action is "+request.getContent());
 		if (request.getContent().equalsIgnoreCase("HPScontroller-params-request")) {
 			//do not send agree message, reply with inform	
 			return null;
@@ -37,22 +36,24 @@ public class PPRequestResponder extends AchieveREResponder {
 		
 	
 	protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
-			System.out.println("Agent "+controller.getLocalName()+": Replying with parameters");
+			System.out.println(controller.getLocalName()+": Replying with parameters");
 			ACLMessage inform = request.createReply();
 			inform.setPerformative(ACLMessage.INFORM);
 			//send HPS parameters
 			try {
-				myAgent.getContentManager().fillContent(inform, controller.getMyParams());
-				//subscribing to the Power Producer for daily plans commands
-				myAgent.addBehaviour(new PowerPlansSubscriptionBehaviour(controller,request.getSender()));
-			} catch (CodecException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OntologyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+					//TODO Check if myParams has been filled
+					myAgent.getContentManager().fillContent(inform,
+							controller.getMyParams());
+					//subscribing to the Power Producer for daily plans commands
+					myAgent.addBehaviour(new PowerPlansSubscriptionBehaviour(
+							controller, request.getSender()));
+				} catch (CodecException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OntologyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			return inform;	
 	}
 

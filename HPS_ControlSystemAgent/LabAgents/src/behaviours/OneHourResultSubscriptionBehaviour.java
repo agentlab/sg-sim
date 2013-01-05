@@ -28,9 +28,8 @@ public class OneHourResultSubscriptionBehaviour extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
 		//prepare initiator and run it
-		System.out.println("Subscribing to the HPS block: "+this.responder);
+		System.out.println(controller.getLocalName()+": subscribing to the HPS block: "+this.responder);
 		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
 		subscribe.setLanguage(new SLCodec().getName());
 		subscribe.setOntology(HPSOntology.getInstance().getName());
@@ -38,6 +37,6 @@ public class OneHourResultSubscriptionBehaviour extends OneShotBehaviour {
 		subscribe.setContent("one-hour-result-subscription");
 		subscribe.addReceiver(this.responder);
 		//start subscription protocol
-		myAgent.addBehaviour(new OneHourResultSubscriptionInitiator(this.controller,subscribe));
+		controller.addBehaviour(new OneHourResultSubscriptionInitiator(this.controller,subscribe));
 	}	
 }	

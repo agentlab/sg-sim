@@ -5,6 +5,7 @@ import java.util.Date;
 import ontology.HPSOntology;
 import ontology.OneHourResult;
 import agents.HPSblockAgent;
+import agents.HPSblocksControlAgent;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
@@ -19,7 +20,7 @@ import jade.proto.SubscriptionResponder.SubscriptionManager;
 
 public class OneHourResultSubscriptionManager implements SubscriptionManager {
 	private HPSblockAgent block;
-	private final int NOTIFICATION_PERIOD=5000;
+	private final int NOTIFICATION_PERIOD=3000;
 	
 	public OneHourResultSubscriptionManager(HPSblockAgent block) {
 		super();
@@ -32,9 +33,9 @@ public class OneHourResultSubscriptionManager implements SubscriptionManager {
 		boolean result=false;
 		if(s.getMessage().getContent().equalsIgnoreCase("one-hour-result-subscription")){
 			block.setResultSubscription(s);
-			System.out.println("Agent "+block.getLocalName()+" has received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
+			System.out.println(block.getLocalName()+": received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
 			//add behavior for sending one hour notifications
-			block.addBehaviour(new TickerBehaviour(block,NOTIFICATION_PERIOD) {
+			block.addBehaviour(new TickerBehaviour(block,1000) {
 				
 				/**
 				 * 
@@ -43,20 +44,26 @@ public class OneHourResultSubscriptionManager implements SubscriptionManager {
 
 				@Override
 				protected void onTick() {
-					// TODO Auto-generated method stub
-					//call local notify method
-					((HPSblockAgent)myAgent).getSubMngr().notify((HPSblockAgent)myAgent);
+					//do nothing until first command received
+					if(!((HPSblockAgent)myAgent).isFirstCommand()){
+						//set the beginning result notification flag and set new period
+						if(!((HPSblockAgent)myAgent).isStartResultNotification()){
+							((HPSblockAgent)myAgent).setStartResultNotification(true);
+							((HPSblockAgent)myAgent).setCurrentAction(((HPSblockAgent)myAgent).getNextHourAction());
+							this.reset(NOTIFICATION_PERIOD);
+						}
+						else ((HPSblockAgent)myAgent).getSubMngr().notify((HPSblockAgent)myAgent);
+					}
+					
 				}
 			});
 			result=true;
 		}
-		// TODO Auto-generated method stub
 		return result;
 	}
 
 	@Override
 	public boolean deregister(Subscription s) throws FailureException {
-		// TODO Auto-generated method stub
 		System.out.println("Agent "+s.getMessage().getSender().getLocalName()+" canceled subscription.");
 		return true;
 	}
@@ -65,23 +72,22 @@ public class OneHourResultSubscriptionManager implements SubscriptionManager {
 	 * @param a
 	 */
 	public void notify(HPSblockAgent a){
-		
+			
 		ACLMessage notification = a.getResultSubscription().getMessage().createReply();
 		notification.setPerformative(ACLMessage.INFORM);
 		notification.setLanguage(new SLCodec().getName()); 
 		notification.setOntology(HPSOntology.getInstance().getName());
 		// Create context		
-		OneHourResult result = new OneHourResult(500*Math.random(), new Date());
+		OneHourResult result = new OneHourResult(block.getCurrentAction().getPower()*(1+0.02*(Math.random()-0.5)), new Date());
 		try {
 			a.getContentManager().fillContent(notification, result);
 			a.getResultSubscription().notify(notification); 
 		} catch (CodecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OntologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		block.setCurrentAction(block.getNextHourAction());	
 	}
 
 }

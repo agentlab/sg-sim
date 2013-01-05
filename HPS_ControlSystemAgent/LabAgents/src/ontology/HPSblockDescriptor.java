@@ -18,26 +18,28 @@ public class HPSblockDescriptor implements Predicate{
 	 * 
 	 */
 	private static final long serialVersionUID = 7820587574620600301L;
+	public enum BlockState{
+		Active,
+		Passive,
+		Damage
+	}
 	private AID id;
 	private double minP;
 	private double maxP;
-	private String state; // possible states are active, passive, damage //may be used enum type for description
-	private double wear; // wear of the block in percent
+	private BlockState state; // possible states are active, passive, damage //may be used enum type for description
 	
 	public HPSblockDescriptor(){
 		//set default values
 		this.id=null;
 		this.minP=100;
 		this.maxP=1000;
-		this.state="passive";
-		this.wear=0;
+		this.state=BlockState.Passive;
 	}
-	public HPSblockDescriptor(AID id, double minP, double maxP, String state, double wear){
+	public HPSblockDescriptor(AID id, double minP, double maxP, BlockState state){
 		this.id=id;
 		this.minP=minP;
 		this.maxP=maxP;
-		this.state=state;
-		this.wear=wear;			
+		this.state=state;		
 	}
 	public AID getId() {
 		return id;
@@ -57,17 +59,10 @@ public class HPSblockDescriptor implements Predicate{
 	public void setMinP(double minP) {
 		this.minP = minP;
 	}
-	public String getState() {
+	public BlockState getState() {
 		return state;
 	}
-	public void setState(String state) {
+	public void setState(BlockState state) {
 		this.state = state;
 	}
-	public double getWear() {
-		return wear;
-	}
-	public void setWear(double wear) {
-		this.wear = wear;
-	}
-	
 }

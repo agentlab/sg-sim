@@ -2,15 +2,12 @@ package behaviours;
 
 import java.util.Vector;
 
-import ontology.HPSblockControlAction;
-import ontology.OneHourResult;
 import ontology.PowerPlan;
 import agents.HPSblocksControlAgent;
 import jade.content.Predicate;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
 import jade.content.onto.UngroundedException;
-import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -26,7 +23,6 @@ public class PowerPlansSubscriptionInitiator extends SubscriptionInitiator {
 
 	public PowerPlansSubscriptionInitiator(Agent a, ACLMessage msg) {
 		super(a, msg);
-		// TODO Auto-generated constructor stub
 		this.controller=(HPSblocksControlAgent) a;
 	}
 	protected void handleRefuse(ACLMessage refuse) {
@@ -41,27 +37,34 @@ public class PowerPlansSubscriptionInitiator extends SubscriptionInitiator {
 		 * handle recieved notification message (power plan)
 		 */
 		try {
-			Predicate ce=(Predicate)myAgent.getContentManager().extractContent(inform);
+			Predicate ce=(Predicate)controller.getContentManager().extractContent(inform);
 			if(ce instanceof PowerPlan){
 				//process recieved result from the block
 				PowerPlan nextDayPlan=(PowerPlan)ce;
-				/**
-				 * PROCESS NEXT DAY POWER PLAN
-				 */
+				System.out.println(controller.getLocalName()+": power plan recieved");
+				//printing th plan
+				for(int i=0;i<nextDayPlan.getPlan().length;i++){
+					System.out.printf("Hour %d planned value:%.2f\n",i,nextDayPlan.getPlan()[i]);
+				}
+				controller.setNextDayPlan(nextDayPlan);
+				controller.setDayPlanRcvd(true);
+				if(controller.isTodayPlanExecuted()){
+					//set recieved plan as current day plan
+					controller.setCurrDayPlan(nextDayPlan);
+					controller.setDayPlanRcvd(false);
+					controller.setTodayPlanExecuted(false);
+				}
 			}	
 		} catch (UngroundedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CodecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OntologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	@Override
-	protected void handleAllResponses(Vector responses){
+	protected void handleAllResponses(@SuppressWarnings("rawtypes") Vector responses){
 		System.out.println(responses.size()+" responces have been recieved");
 	}
 	@Override
