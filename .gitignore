@@ -4,4 +4,7 @@
 *.jar
 *.war
 *.ear
+*.zip
+APDescription.txt
+MTPs-Main-Container.txt
 bin
