@@ -182,9 +182,15 @@ public class BOAgent extends Agent {
 			ACLMessage reply=myAgent.receive();
 			
 			if (reply!=null) {
-				
-				System.out.println("Mode is received");
-				
+				ACLMessage mode=new ACLMessage(ACLMessage.INFORM);
+				mode.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
+				if (reply.getPerformative()==ACLMessage.PROPOSE) {
+					mode.setContent("normal");
+				}
+				else {
+					mode.setContent("econom");
+				}
+				myAgent.send(mode);
 			}
 			else {
 				block();

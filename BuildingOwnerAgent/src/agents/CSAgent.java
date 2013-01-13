@@ -63,13 +63,8 @@ public String EValue;
 			// TODO Auto-generated method stub
 			ACLMessage msg= myAgent.receive();
 			if (msg!=null) {
-				System.out.println(msg.getContent());
-				if(msg.getContent()=="normal") {
-					System.out.println("CSAgent: Work mode is normal");
-				}
-				else {
-					System.out.println("CSAgent: Work mode is econom");
-				}				
+				System.out.println("Mode was received, work mode is "+msg.getContent());
+				
 			}			
 			else {
 				block();
