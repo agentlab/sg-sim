@@ -52,7 +52,7 @@ public class RegisterBehaviour extends TickerBehaviour {
 				subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
 				// Note that iota is not included in SL0
 				subscribe.setLanguage(FIPANames.ContentLanguage.FIPA_SL);
-				
+				subscribe.setOntology("GydroelectricpowerBlockAgentOntology");
 				// create StubscriptionInitiator behaviour
 				myAgent.addBehaviour(new SubscrInitiatorBehaviour((TransAgent)myAgent, subscribe));
 				

@@ -1,7 +1,6 @@
 package behaviours;
 import ontologies.*;
 
-import internal_classes.SendMessage;
 import jade.content.onto.basic.Action;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -103,7 +102,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 		try {
 			ACLMessage notification = sub.getMessage().createReply();
 			notification.setPerformative(ACLMessage.INFORM);
-			myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
+			//myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
 			Action act = new Action(myAgent.getAID(), sm);
 			myAgent.getContentManager().fillContent(notification, act);
 

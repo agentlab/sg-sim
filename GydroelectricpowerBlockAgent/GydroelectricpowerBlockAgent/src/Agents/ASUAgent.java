@@ -1,7 +1,5 @@
 package Agents;
 
-import internal_classes.AssignPowerRequest;
-import internal_classes.BeginPowerTransitionRequest;
 
 import java.util.Date;
 import behaviours.*;

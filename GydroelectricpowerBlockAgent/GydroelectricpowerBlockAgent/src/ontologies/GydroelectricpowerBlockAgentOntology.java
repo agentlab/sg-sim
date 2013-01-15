@@ -1,11 +1,5 @@
 package ontologies;
 
-import internal_classes.AssignPowerRequest;
-import internal_classes.BeginPowerTransitionRequest;
-import internal_classes.Electricity;
-import internal_classes.SendMessage;
-import internal_classes.State;
-import internal_classes.TimeDelay;
 import jade.content.onto.BeanOntology;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;

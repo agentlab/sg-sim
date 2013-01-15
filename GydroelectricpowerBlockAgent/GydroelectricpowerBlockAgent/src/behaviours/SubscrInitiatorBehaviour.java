@@ -61,13 +61,6 @@ public class SubscrInitiatorBehaviour extends SubscriptionInitiator {
 	protected void handleInform(ACLMessage inform) {
 		System.out.println("Agent " + myAgent.getAID().getName() + " received the INFORM from agent " + inform.getSender().getName());
 
-		/*try {
-			//someYourData = (String) inform.getContentObject();
-			//System.out.println("Received data " + someYourData);
-		} catch (UnreadableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 
 	}
 
