@@ -5,10 +5,6 @@ import jade.core.AID;
 
 public class TPPDescriptor implements Predicate {
 
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -1088316555701498765L;
 	private AID tppId;
 	private double availP; //доступная мощность
