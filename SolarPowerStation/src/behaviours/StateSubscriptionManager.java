@@ -12,7 +12,7 @@ import jade.proto.SubscriptionResponder.SubscriptionManager;
 
 import java.util.Vector;
 
-import sg_sim.WindTurbAgent;
+import sg_sim.SolarAgent;
 
 /**
  * This class serves all subscription operation form subscription responder side
@@ -23,7 +23,7 @@ import sg_sim.WindTurbAgent;
 //������ - ������ �����������
 public class StateSubscriptionManager implements SubscriptionManager {
 	protected Vector<Subscription> subscriptions = new Vector<Subscription>();
-	protected sg_sim.WindTurbAgent myAgent;
+	protected sg_sim.SolarAgent myAgent;
 	protected WindTurbBehaviour windTurbine;
 
 	/**
@@ -31,7 +31,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 	 * 
 	 * @param agent
 	 */
-	public StateSubscriptionManager(WindTurbAgent agent) {
+	public StateSubscriptionManager(SolarAgent agent) {
 		myAgent = agent;
 		System.out.println("Subscription manager: Herzlich willkommen");
 	}

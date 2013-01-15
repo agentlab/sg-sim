@@ -15,14 +15,11 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.SubscriptionResponder;
 
-public class WindTurbAgent extends Agent {
+public class SolarAgent extends Agent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
-	protected final String name = "WindTurbine"; // agent service name
+	protected final String name = "SolarAgent"; // agent service name
 	protected final String type = "Power"; // agent service type
 	protected final String type2 = "Electricity"; // agent service type
 
@@ -30,24 +27,26 @@ public class WindTurbAgent extends Agent {
 	private SubscriptionResponder dfSubscriptionResponder;
 	
 	private Codec codec = new SLCodec();
-	private Ontology ontology = WindTurbOntology.getInstance();
-	private int windSpeed=12;
-	private double airDensity=1.225;
-	private int length=52;
-	private double bLimit=0.4;
+	private Ontology ontology = SolarAgentOntology.getInstance();
+	
+	private double insol = 21.0; //Insolation in January
+	private double Wbat = 1000; //Nominal battery power
+	private int insolMax = 1000; //Max insolation on m2
+	private double mu = 0.91; //KPD
+	
 	public void setup() { 
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType(type); // your agent type
 		sd.setName(name); // your agent name
-		sd.addOntologies("Wind_Turbine_Ontology");
+		sd.addOntologies("SolarAgentOntology");
 		dfd.addServices(sd);
 		
 		ServiceDescription sd2 = new ServiceDescription();
 		sd2.setType(type2); // your agent type
 		sd2.setName(name); // your agent name
-		sd2.addOntologies("Wind_Turbine_Ontology");
+		sd2.addOntologies("SolarAgentOntology");
 		dfd.addServices(sd2);
 		
 		subManager = new behaviours.StateSubscriptionManager (this);
@@ -59,16 +58,15 @@ public class WindTurbAgent extends Agent {
 			getContentManager().registerLanguage(codec);
 			getContentManager().registerOntology(ontology);
 
-			if (this.windSpeed==0);
-			else System.out.println("Shhhhh...");
+			if (this.insol==0);
+			else System.out.println("Polar night, sir!");
 			addBehaviour(dfSubscriptionResponder);
 			
-			this.addBehaviour(new WindTurbBehaviour(this, windSpeed, airDensity, length, bLimit, subManager, dfSubscriptionResponder));
+			this.addBehaviour(new WindTurbBehaviour(this, insol, Wbat, insolMax, mu, subManager, dfSubscriptionResponder));
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
-		
-		
+	
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException fe) {
@@ -76,10 +74,7 @@ public class WindTurbAgent extends Agent {
 		}
 
 		// Initiate the SubscriptionManager used by the DF
-		
-
 		// message template for subscription
-		
 	}
 
 }

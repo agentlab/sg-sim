@@ -13,7 +13,6 @@ import jade.lang.acl.ACLMessage;
 /**
  * Agent subscribes to other agent and receives subscription data
  * Has TWO behaviours: RegisterBehaviour and StubscriptionInitiator
- * 
  */
 public class SubscrAgent extends Agent {
 	private static final long serialVersionUID = -2961241167339514488L;
@@ -22,8 +21,6 @@ public class SubscrAgent extends Agent {
 
 	/**
 	 * agent initializations
-	 * 
-	 * @see jade.core.Agent#setup()
 	 */
 	@Override
 	protected void setup() {
@@ -52,7 +49,7 @@ public class SubscrAgent extends Agent {
 
 	protected void subscribe() {
 		ServiceDescription sd = new ServiceDescription();
-		sd.setName("WindTurbine");
+		sd.setName("SolarAgent");
 		sd.setType("Power");
 		
 		System.out.println("It's subscribes all the way down");
@@ -65,8 +62,6 @@ public class SubscrAgent extends Agent {
 
 	/**
 	 * Put agent clean-up operations here
-	 * 
-	 * @see jade.core.Agent#takeDown()
 	 */
 	@Override
 	protected void takeDown() {

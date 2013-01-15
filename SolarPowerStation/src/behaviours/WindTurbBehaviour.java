@@ -21,10 +21,10 @@ public class WindTurbBehaviour extends TickerBehaviour {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int windSpeed;
-	private double airDensity;
-	private int length;
-	private double bLimit;
+	private double insol;
+	private double Wbat;
+	private int insolMax;
+	private double mu;
 	private double current_power;
 	private double assigned_power;
 	private SubscriptionResponder dfSubscriptionResponder;
@@ -33,12 +33,12 @@ public class WindTurbBehaviour extends TickerBehaviour {
 	private double transitionDelta;
 	private boolean isInTransition;
 
-	public WindTurbBehaviour(Agent a, int windsp, double airdens, int leng, double blim, StateSubscriptionManager subManager, SubscriptionResponder dfSubscriptionResp) {
+	public WindTurbBehaviour(Agent a, double insol, double Wbat, int insolMax, double mu, StateSubscriptionManager subManager, SubscriptionResponder dfSubscriptionResp) {
 		super(a, 5000);
-		this.airDensity=airdens;
-		this.bLimit=blim;
-		this.length=leng;
-		this.windSpeed=windsp;
+		this.insol=insol;
+		this.Wbat=Wbat;
+		this.insolMax=insolMax;
+		this.mu=mu;
 		current_power=max_power_calc();
 		this.assigned_power=this.current_power;
 		this.subManager=subManager;
@@ -123,8 +123,7 @@ public class WindTurbBehaviour extends TickerBehaviour {
 
 	public double max_power_calc ()
 	{
-		double swept_area=this.length*this.length*Math.PI;
-		return 0.5*swept_area*this.airDensity*this.bLimit*Math.pow(windSpeed, 3);
+		return insol*Wbat*mu/insolMax;
 	}
 
 	public double time_delay() {

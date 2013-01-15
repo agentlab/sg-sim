@@ -22,7 +22,7 @@ public class PseudoAlexAgent extends Agent {
 	 * 
 	 */
 	private Codec codec = new SLCodec(); 
-	private Ontology ontology = WindTurbOntology.getInstance(); //создание экземпляров классов онтологии и языка
+	private Ontology ontology = SolarAgentOntology.getInstance(); //создание экземпляров классов онтологии и языка
 	
 	private static final long serialVersionUID = 6615714058341878330L; 
 	public void setup() { 
@@ -64,7 +64,7 @@ public class PseudoAlexAgent extends Agent {
 
 			System.out.println(agentID.getLocalName());
 			
-			if(agentID.getLocalName().compareTo("WindTurbineAgent") != 0) continue;
+			if(agentID.getLocalName().compareTo("SolarAgent") != 0) continue;
 			
 			aclmsg.clearAllReceiver();
 			aclmsg.addReceiver(agentID);

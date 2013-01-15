@@ -4,13 +4,13 @@ import jade.content.onto.BeanOntology;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 
-public class WindTurbOntology extends BeanOntology {
+public class SolarAgentOntology extends BeanOntology {
 	
-	public static final String ONTOLOGY_NAME = "Wind_Turbine_Ontology";
-	private static Ontology instance = new WindTurbOntology(ONTOLOGY_NAME);
+	public static final String ONTOLOGY_NAME = "SolarAgent_Ontology";
+	private static Ontology instance = new SolarAgentOntology(ONTOLOGY_NAME);
 	public static Ontology getInstance() { return instance; }
 
-	public WindTurbOntology(String name) {
+	public SolarAgentOntology(String name) {
 		super(name);
 		
 		try {
@@ -29,9 +29,6 @@ public class WindTurbOntology extends BeanOntology {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 }
