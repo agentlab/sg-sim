@@ -19,11 +19,8 @@ import sg_sim.WindTurbAgent;
  * After first subscriber registration it starts DataProcessingBehaviour.
  * 
  * It's methods called by jade.proto.SubscriptionResponder behaviour.
- * 
- * @see jade.proto.SubscriptionResponder
- *
  */
-//Вектор - список подписчиков
+//пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 public class StateSubscriptionManager implements SubscriptionManager {
 	protected Vector<Subscription> subscriptions = new Vector<Subscription>();
 	protected sg_sim.WindTurbAgent myAgent;
@@ -101,7 +98,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 		try {
 			ACLMessage notification = sub.getMessage().createReply();
 			notification.setPerformative(ACLMessage.INFORM);
-			myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
+			//myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
 			Action act = new Action(myAgent.getAID(), sm);
 			myAgent.getContentManager().fillContent(notification, act);
 

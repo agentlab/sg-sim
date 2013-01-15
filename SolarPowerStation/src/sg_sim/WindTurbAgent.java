@@ -59,7 +59,7 @@ public class WindTurbAgent extends Agent {
 			getContentManager().registerLanguage(codec);
 			getContentManager().registerOntology(ontology);
 
-			if (this.windSpeed==0) ;
+			if (this.windSpeed==0);
 			else System.out.println("Shhhhh...");
 			addBehaviour(dfSubscriptionResponder);
 			

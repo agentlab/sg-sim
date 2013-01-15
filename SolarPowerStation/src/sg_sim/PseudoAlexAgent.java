@@ -64,7 +64,7 @@ public class PseudoAlexAgent extends Agent {
 
 			System.out.println(agentID.getLocalName());
 			
-			if(agentID.getLocalName().compareTo("SrcAg") != 0) continue;
+			if(agentID.getLocalName().compareTo("WindTurbineAgent") != 0) continue;
 			
 			aclmsg.clearAllReceiver();
 			aclmsg.addReceiver(agentID);
