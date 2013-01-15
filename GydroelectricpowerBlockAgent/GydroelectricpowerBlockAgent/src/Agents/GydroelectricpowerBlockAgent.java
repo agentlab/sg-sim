@@ -18,7 +18,7 @@ import jade.proto.SubscriptionResponder;
 public class GydroelectricpowerBlockAgent extends Agent {
 
 	/**
-	 * 
+	 * это главный агент
 	 */
 	private static final long serialVersionUID = 1L;
 	
