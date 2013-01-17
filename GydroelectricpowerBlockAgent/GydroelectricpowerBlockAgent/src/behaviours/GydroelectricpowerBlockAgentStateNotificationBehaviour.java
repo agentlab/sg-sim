@@ -1,8 +1,8 @@
 package behaviours;
 
-import internal_classes.Electricity;
-import internal_classes.SendMessage;
-import internal_classes.State;
+import ontologies.Electricity;
+import ontologies.SendMessage;
+import ontologies.State;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 

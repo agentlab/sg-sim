@@ -1,9 +1,5 @@
 package behaviours;
 
-import internal_classes.AssignPowerRequest;
-import internal_classes.BeginPowerTransitionRequest;
-import internal_classes.SendMessage;
-import internal_classes.TimeDelay;
 import ontologies.*;
 import jade.core.Agent;
 import jade.lang.acl.MessageTemplate;

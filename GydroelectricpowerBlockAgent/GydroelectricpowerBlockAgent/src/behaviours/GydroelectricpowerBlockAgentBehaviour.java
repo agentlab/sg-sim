@@ -1,6 +1,5 @@
 package behaviours;
 
-import internal_classes.State;
 import jade.core.Agent;
 
 import jade.core.behaviours.Behaviour;
@@ -104,22 +103,6 @@ public class GydroelectricpowerBlockAgentBehaviour extends TickerBehaviour {
 		isInTransition = true;
 		
 		System.out.println("Entering a transient state");
-		/*
-		while (current_power != assigned_power) {
-			current_power -= delta;
-			if (Math.abs(current_power - assigned_power) < delta) {
-				current_power = assigned_power; 
-				break;
-			}
-			try {
-				for(int i = 5000; i > 0; i -= 100) {
-					Thread.yield();
-					Thread.sleep(100);
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}*/
 	}
 
 	public double max_power_calc ()

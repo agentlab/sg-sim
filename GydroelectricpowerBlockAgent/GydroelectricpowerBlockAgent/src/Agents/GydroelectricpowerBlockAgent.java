@@ -18,7 +18,7 @@ import jade.proto.SubscriptionResponder;
 public class GydroelectricpowerBlockAgent extends Agent {
 
 	/**
-	 * 
+	 * это главный агент
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -31,23 +31,23 @@ public class GydroelectricpowerBlockAgent extends Agent {
 	
 	private Codec codec = new SLCodec();
 	private Ontology ontology = GydroelectricpowerBlockAgentOntology.getInstance();
-	private int consumption=250;
-	private double perfomance=0.75;
-	private int pressure=38;
-	private double constg=9.81;
+	private int consumption=250; //rashod
+	private double perfomance=0.75; //CPD
+	private int pressure=38; //napor
+	private double constg=9.81; //g
 	public void setup() { 
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType(type); // your agent type
 		sd.setName(name); // your agent name
-		sd.addOntologies("Wind_Turbine_Ontology");
+		sd.addOntologies("GydroelectricpowerBlockAgentOntology");
 		dfd.addServices(sd);
 		
 		ServiceDescription sd2 = new ServiceDescription();
 		sd2.setType(type2); // your agent type
 		sd2.setName(name); // your agent name
-		sd2.addOntologies("Wind_Turbine_Ontology");
+		sd2.addOntologies("GydroelectricpowerBlockAgentOntology");
 		dfd.addServices(sd2);
 		
 		subManager = new behaviours.StateSubscriptionManager (this);
