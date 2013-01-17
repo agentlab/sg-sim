@@ -15,7 +15,6 @@ import jade.lang.acl.ACLMessage;
  * This behaviour searches for first agent which matches template.
  * Then it starts SubscrInitiatorBehaviour.
  * Then it cancels itself if all done
- * 
  */
 public class RegisterBehaviour extends TickerBehaviour {
 	private static final long serialVersionUID = 3384651319762649616L;

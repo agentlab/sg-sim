@@ -6,7 +6,7 @@ import jade.content.onto.OntologyException;
 
 public class SolarAgentOntology extends BeanOntology {
 	
-	public static final String ONTOLOGY_NAME = "SolarAgent_Ontology";
+	public static final String ONTOLOGY_NAME = "SolarAgentOntology";
 	private static Ontology instance = new SolarAgentOntology(ONTOLOGY_NAME);
 	public static Ontology getInstance() { return instance; }
 

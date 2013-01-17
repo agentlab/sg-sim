@@ -8,7 +8,6 @@ import jade.proto.SubscriptionInitiator;
 /**
  * This behaviour subscribes myAgent to the data of given agent. Then it
  * serves all subscription operation.
- * 
  */
 public class SubscrInitiatorBehaviour extends SubscriptionInitiator {
 	private static final long serialVersionUID = 2596974171933664345L;
@@ -32,8 +31,7 @@ public class SubscrInitiatorBehaviour extends SubscriptionInitiator {
 	/**
 	 * @see jade.proto.SubscriptionInitiator#handleAgree(jade.lang.acl.ACLMessage)
 	 * 
-	 * @param agree
-	 *            - message with AGREE performative
+	 * @param agree - message with AGREE performative
 	 */
 	@Override
 	protected void handleAgree(ACLMessage agree) {

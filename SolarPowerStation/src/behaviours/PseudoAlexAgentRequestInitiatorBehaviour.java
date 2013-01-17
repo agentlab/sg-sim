@@ -7,9 +7,6 @@ import jade.lang.acl.ACLMessage;
 
 public class  PseudoAlexAgentRequestInitiatorBehaviour extends AchieveREInitiator {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 
