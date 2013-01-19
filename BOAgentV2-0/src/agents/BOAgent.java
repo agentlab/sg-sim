@@ -24,10 +24,15 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
 
 public class BOAgent extends Agent {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5238728634416626059L;
 private int nResponders;
 private String volume;
 private AID[] brokeragents;
-private BOAgent a;	
+private BOAgent a;
+public int rcnt=0;
 	protected void setup() {
   	
   	
@@ -45,6 +50,10 @@ private BOAgent a;
   }
 	private class ReceiveFromCSAgent extends CyclicBehaviour {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4475845021867741580L;
 		private MessageTemplate mtCS;
 		private BOAgent agent;
 		
@@ -58,7 +67,21 @@ private BOAgent a;
 			mtCS=MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME));
 			ACLMessage receivecs=myAgent.receive(mtCS);
 			if (receivecs!=null){
-				volume=receivecs.getContent();
+				InformMessage a;
+				try {
+					a = (InformMessage)getContentManager().extractContent(receivecs);
+					volume=String.valueOf(a.getVolume());
+				} catch (UngroundedException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (CodecException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (OntologyException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				
 				//Поиск брокеров на желтых страницах
 				DFAgentDescription template = new DFAgentDescription();
 				ServiceDescription sd = new ServiceDescription();
@@ -82,21 +105,48 @@ private BOAgent a;
 		  			msg.addReceiver(brokeragents[i]);
 		  		}
 					msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-					msg.setLanguage(new SLCodec().getName());
+					
 					// We want to receive a reply in 10 secs
 					msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 					
 					msg.setConversationId("price-request");
-					msg.setContent(volume);
+					
+					msg.setLanguage(new SLCodec().getName());	
+					msg.setOntology(RequestOntology.getInstance().getName());
+					InformMessage imsg = new InformMessage();
+					imsg.setVolume(Integer.parseInt(volume));
+					try {
+						((BOAgent)myAgent).getContentManager().fillContent(msg, imsg);
+					} catch (CodecException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (OntologyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
 					addBehaviour(new ContractNetInitiator(this.agent, msg) {
 						
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 4290227958411834245L;
+
 						protected void handlePropose(ACLMessage propose, Vector v) {
 							System.out.println("Agent "+propose.getSender().getName()+" proposed "+propose.getContent());
 						}
 						
 						protected void handleRefuse(ACLMessage refuse) {
+							
 							System.out.println("Agent "+refuse.getSender().getName()+" refused");
+							rcnt++;
+							if (rcnt==brokeragents.length){
+								ACLMessage csmsg=new ACLMessage(ACLMessage.INFORM);
+								csmsg.setContent("econom");
+								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
+								send(csmsg);
+								rcnt=0;
+							}
 						}
 						
 						protected void handleFailure(ACLMessage failure) {
@@ -104,6 +154,10 @@ private BOAgent a;
 								// FAILURE notification from the JADE runtime: the receiver
 								// does not exist
 								System.out.println("Responder does not exist");
+								ACLMessage csmsg= new ACLMessage(ACLMessage.INFORM);
+								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
+								csmsg.setContent("econom");
+								send(csmsg);
 							}
 							else {
 								System.out.println("Agent "+failure.getSender().getName()+" failed");
@@ -118,7 +172,7 @@ private BOAgent a;
 								System.out.println("Timeout expired: missing "+(nResponders - responses.size())+" responses");
 							}
 							// Evaluate proposals.
-							int bestProposal = 1000;
+							int bestProposal = 100000;
 							AID bestProposer = null;
 							ACLMessage accept = null;
 							Enumeration e = responses.elements();

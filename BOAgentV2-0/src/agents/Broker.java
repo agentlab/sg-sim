@@ -5,7 +5,7 @@ import Ontology.RequestOntology;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
-import jade.core.AID;
+import jade.content.onto.UngroundedException;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -17,12 +17,16 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.AchieveREInitiator;
 import jade.proto.ContractNetResponder;
 
 public class Broker extends Agent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7779532957753246851L;
 	public String price;
 	public String volume;
+	public String Evalue;
 	protected void setup() {
 		System.out.println("Agent "+getLocalName()+" waiting for CFP...");
 		this.getContentManager().registerLanguage(new SLCodec());
@@ -65,9 +69,23 @@ public class Broker extends Agent {
 			
 			@Override
 			protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
+				InformMessage a;
 				System.out.println("Agent "+getLocalName()+": CFP received from "+cfp.getSender().getName()+". Action is "+cfp.getConversationId());
+				try {
+					a = (InformMessage)getContentManager().extractContent(cfp);
+					Evalue=String.valueOf(a.getVolume());
+				} catch (UngroundedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (CodecException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (OntologyException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				
-				if (Integer.parseInt(cfp.getContent())<Integer.parseInt(volume)) {
+				if (Integer.parseInt(Evalue)<Integer.parseInt(volume)) {
 					// We provide a proposal
 					System.out.println("Agent "+getLocalName()+": Proposing "+price);
 					ACLMessage propose = cfp.createReply();
@@ -99,16 +117,12 @@ public class Broker extends Agent {
 			@Override
 			protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose,ACLMessage accept) throws FailureException {
 				System.out.println("Agent "+getLocalName()+": Proposal accepted");
-				if (performAction()) {
+				
 					System.out.println("Agent "+getLocalName()+": Action successfully performed");
 					ACLMessage inform = accept.createReply();
 					inform.setPerformative(ACLMessage.INFORM);
 					return inform;
-				}
-				else {
-					System.out.println("Agent "+getLocalName()+": Action execution failed");
-					throw new FailureException("unexpected-error");
-				}	
+				
 			}
 
 			protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
@@ -116,13 +130,5 @@ public class Broker extends Agent {
 			}
 		} );
 	}
-	private int evaluateAction() {
-		// Simulate an evaluation by generating a random number
-		return (int) (Math.random() * 10);
-	}
-
-	private boolean performAction() {
-		// Simulate action execution by generating a random number
-		return (Math.random() > 0.2);
-	}
+	
 }
