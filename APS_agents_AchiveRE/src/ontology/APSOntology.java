@@ -1,0 +1,31 @@
+package ontology;
+
+
+import jade.content.onto.Ontology;
+import jade.content.onto.BeanOntology;
+import jade.content.onto.BeanOntologyException;
+
+public class APSOntology extends BeanOntology {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2558231023308074358L;
+	public static final String ONTOLOGY_NAME = "APSOntology";
+	private static Ontology instance = new APSOntology(ONTOLOGY_NAME);
+	public static Ontology getInstance() { return instance; }
+
+	public APSOntology(String name) {
+		super(name);
+		// TODO Auto-generated constructor stub
+		try {
+			add(APSblockDescriptor.class);
+			add(OneHourResult.class);
+			add(APSblockControlAction.class);
+		} catch (BeanOntologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+
+}
