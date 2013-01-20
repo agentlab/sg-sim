@@ -16,7 +16,8 @@ import jade.proto.SubscriptionResponder.SubscriptionManager;
 
 import java.util.Vector;
 
-import sg_sim.SolarAgent;
+import agents.SolarAgent;
+
 
 import jade.domain.FIPANames;
 
@@ -29,7 +30,7 @@ import jade.domain.FIPANames;
 
 public class StateSubscriptionManager implements SubscriptionManager {
 	protected Vector<Subscription> subscriptions = new Vector<Subscription>();
-	protected sg_sim.SolarAgent myAgent;
+	protected agents.SolarAgent myAgent;
 	protected WindTurbBehaviour windTurbine;
 
 	/**

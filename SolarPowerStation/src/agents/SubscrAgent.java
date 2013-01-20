@@ -1,4 +1,4 @@
-package sg_sim;
+package agents;
 
 import ontologies.SolarAgentOntology;
 import jade.content.lang.Codec;
@@ -33,7 +33,6 @@ public class SubscrAgent extends Agent {
 	protected void setup() {
 		// Printout a welcome message
 		System.out.println(getAID().getName() + " started.");
-		
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(ontology);
 
@@ -67,7 +66,7 @@ public class SubscrAgent extends Agent {
 		DFAgentDescription template = new DFAgentDescription();
 		template.addServices(sd);
 		
-		addBehaviour(new TestBehaviour.RegisterBehaviour(template, this, 1000));
+		addBehaviour(new behaviours.RegisterBehaviour(template, this, 1000));
 	}
 
 	/**

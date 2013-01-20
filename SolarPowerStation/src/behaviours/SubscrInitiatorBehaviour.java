@@ -1,9 +1,9 @@
-package TestBehaviour;
+package behaviours;
 
+import agents.SolarAgent;
+import agents.SubscrAgent;
 import ontologies.AssignPowerRequest;
 import ontologies.Message;
-import sg_sim.SolarAgent;
-import sg_sim.SubscrAgent;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.onto.basic.Action;

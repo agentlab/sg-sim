@@ -1,4 +1,4 @@
-package sg_sim;
+package agents;
 
 import java.util.Date;
 import behaviours.*;
