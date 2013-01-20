@@ -7,9 +7,6 @@ import jade.content.onto.BeanOntologyException;
 
 public class TPPOntology extends BeanOntology {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2558231023308074358L;
 	public static final String ONTOLOGY_NAME = "TPPOntology";
 	private static Ontology instance = new TPPOntology(ONTOLOGY_NAME);

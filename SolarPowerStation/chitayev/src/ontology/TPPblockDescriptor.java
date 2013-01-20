@@ -5,14 +5,10 @@ import jade.core.AID;
 
 public class TPPblockDescriptor implements Predicate{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5295335826030436151L;
 	public enum BlockState{
 		Active,
-		Passive,
-		Damage
+		Passive
 	}
 	private AID id;
 	private double minP;
@@ -22,8 +18,8 @@ public class TPPblockDescriptor implements Predicate{
 	public TPPblockDescriptor(){
 		//конструктор по умолчанию
 		this.id=null;
-		this.minP=100;
-		this.maxP=1000;
+		this.minP=10;
+		this.maxP=100;
 		this.state=BlockState.Passive;
 	}
 	public TPPblockDescriptor(AID id, double minP, double maxP, BlockState state){
