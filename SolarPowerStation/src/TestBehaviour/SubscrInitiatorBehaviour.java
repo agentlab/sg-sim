@@ -1,6 +1,12 @@
 package TestBehaviour;
 
+import ontologies.AssignPowerRequest;
+import ontologies.SendMessage;
+import sg_sim.SolarAgent;
 import sg_sim.SubscrAgent;
+import jade.content.Concept;
+import jade.content.ContentElement;
+import jade.content.onto.basic.Action;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.SubscriptionInitiator;
@@ -58,14 +64,18 @@ public class SubscrInitiatorBehaviour extends SubscriptionInitiator {
 	@Override
 	protected void handleInform(ACLMessage inform) {
 		System.out.println("Agent " + myAgent.getAID().getName() + " received the INFORM from agent " + inform.getSender().getName());
-
-		/*try {
-			//someYourData = (String) inform.getContentObject();
-			//System.out.println("Received data " + someYourData);
-		} catch (UnreadableException e) {
+		Concept action = null;
+		ContentElement content;
+		try {
+			content = myAgent.getContentManager().extractContent(inform);
+			action = ((Action)content).getAction();
+			SendMessage Message2 = (SendMessage) action;
+		    boolean Message3 = Message2.getMsgState().getState();
+			System.out.println("Received data: " + Message3);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 
 	}
 

@@ -5,9 +5,6 @@ import jade.content.*;
 
 public class SendMessage implements AgentAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6876274843885978495L;
 	private Electricity msg_el;
 	private TimeDelay msg_td;

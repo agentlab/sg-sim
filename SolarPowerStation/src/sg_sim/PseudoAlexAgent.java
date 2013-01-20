@@ -34,7 +34,7 @@ public class PseudoAlexAgent extends Agent {
 		//конструктор сообщения
 		ACLMessage aclmsg = new ACLMessage(ACLMessage.REQUEST);		
 		AssignPowerRequest apr = new AssignPowerRequest();
-		apr.setAssignedPower(428500);
+		apr.setAssignedPower(19.11);
 		
 		aclmsg.setLanguage(codec.getName());
 		aclmsg.setOntology(ontology.getName());

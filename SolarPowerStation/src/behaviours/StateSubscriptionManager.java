@@ -1,6 +1,10 @@
 package behaviours;
 import ontologies.*;
 
+import jade.content.Concept;
+import jade.content.lang.Codec;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.Ontology;
 import jade.content.onto.basic.Action;
 import jade.domain.FIPAAgentManagement.FIPAManagementOntology;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -13,6 +17,9 @@ import jade.proto.SubscriptionResponder.SubscriptionManager;
 import java.util.Vector;
 
 import sg_sim.SolarAgent;
+
+import jade.domain.FIPANames;
+
 
 /**
  * This class serves all subscription operation form subscription responder side
@@ -86,6 +93,10 @@ public class StateSubscriptionManager implements SubscriptionManager {
 		}
 	}
 
+	
+	private Codec codec = new SLCodec();
+	private Ontology ontology = SolarAgentOntology.getInstance();
+	
 	/**
 	 * Notifies subscriber with INFORM message
 	 * 
@@ -97,11 +108,18 @@ public class StateSubscriptionManager implements SubscriptionManager {
 	private void notify(Subscription sub, SendMessage sm) {
 		try {
 			ACLMessage notification = sub.getMessage().createReply();
+			myAgent.getContentManager().registerLanguage(codec); //регистрация языка и онтологии
+			myAgent.getContentManager().registerOntology(ontology);
 			notification.setPerformative(ACLMessage.INFORM);
+			notification.setLanguage(codec.getName());
+			notification.setOntology(ontology.getName());
+			notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 			//myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
-			Action act = new Action(myAgent.getAID(), sm);
-			myAgent.getContentManager().fillContent(notification, act);
-
+			try {
+				myAgent.getContentManager().fillContent(notification, new Action(myAgent.getAID(), sm));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			sub.notify(notification);
 
 			System.out.println("Agent " + myAgent.getAID().getName() + " notified the agent " + sub.getMessage().getSender().getName());

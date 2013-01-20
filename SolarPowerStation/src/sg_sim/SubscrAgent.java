@@ -1,5 +1,9 @@
 package sg_sim;
 
+import ontologies.SolarAgentOntology;
+import jade.content.lang.Codec;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.Ontology;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -19,6 +23,9 @@ public class SubscrAgent extends Agent {
 	protected final String name = "YourTestAgentServiceName"; // agent service name
 	protected final String type = "YourTestAgentServiceType"; // agent service type
 
+	private Codec codec = new SLCodec();
+	private Ontology ontology = SolarAgentOntology.getInstance();
+	
 	/**
 	 * agent initializations
 	 */
@@ -26,6 +33,9 @@ public class SubscrAgent extends Agent {
 	protected void setup() {
 		// Printout a welcome message
 		System.out.println(getAID().getName() + " started.");
+		
+		getContentManager().registerLanguage(codec);
+		getContentManager().registerOntology(ontology);
 
 		// Register the service in the yellow pages
 		ServiceDescription sd = new ServiceDescription();
