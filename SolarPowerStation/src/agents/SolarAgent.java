@@ -16,7 +16,6 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.SubscriptionResponder;
 
 public class SolarAgent extends Agent {
-
 	private static final long serialVersionUID = 1L;
 	
 	protected final String name = "SolarAgent"; // agent service name
