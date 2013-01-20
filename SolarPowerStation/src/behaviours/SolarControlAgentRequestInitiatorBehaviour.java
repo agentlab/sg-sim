@@ -5,12 +5,12 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
 
-public class  PseudoAlexAgentRequestInitiatorBehaviour extends AchieveREInitiator {
+public class  SolarControlAgentRequestInitiatorBehaviour extends AchieveREInitiator {
 
 	private static final long serialVersionUID = 1L;
 
 
-	public PseudoAlexAgentRequestInitiatorBehaviour(Agent a, ACLMessage msg) {
+	public SolarControlAgentRequestInitiatorBehaviour(Agent a, ACLMessage msg) {
 		super(a, msg);
 		// TODO Auto-generated constructor stub
 	}

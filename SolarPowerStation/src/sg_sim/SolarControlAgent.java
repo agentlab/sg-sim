@@ -17,10 +17,7 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.ACLMessage;
 
 
-public class PseudoAlexAgent extends Agent {
-	/**
-	 * 
-	 */
+public class SolarControlAgent extends Agent {
 	private Codec codec = new SLCodec(); 
 	private Ontology ontology = SolarAgentOntology.getInstance(); //создание экземпляров классов онтологии и языка
 	
@@ -71,7 +68,7 @@ public class PseudoAlexAgent extends Agent {
 			
 			System.out.println("Sending to " + agentID);
 			
-			addBehaviour(new PseudoAlexAgentRequestInitiatorBehaviour(this, aclmsg)); 
+			addBehaviour(new SolarControlAgentRequestInitiatorBehaviour(this, aclmsg)); 
 			
 			try {
 				Thread.yield();
@@ -98,7 +95,7 @@ public class PseudoAlexAgent extends Agent {
 			
 			System.out.println("Sending to " + agentID);
 			
-			addBehaviour(new PseudoAlexAgentRequestInitiatorBehaviour(this, aclmsg2)); 
+			addBehaviour(new SolarControlAgentRequestInitiatorBehaviour(this, aclmsg2)); 
 		}
 	}
 
