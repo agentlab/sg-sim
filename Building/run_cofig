@@ -1,0 +1,2 @@
+-gui
+Building:agents.BuildingAgent;Consumer1:agents.CustomerAgent;Consumer2:agents.CustomerAgent;NRJStationAgent:agents.NRJStationAgent
