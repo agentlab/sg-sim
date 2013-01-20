@@ -1,7 +1,7 @@
 package TestBehaviour;
 
 import ontologies.AssignPowerRequest;
-import ontologies.SendMessage;
+import ontologies.Message;
 import sg_sim.SolarAgent;
 import sg_sim.SubscrAgent;
 import jade.content.Concept;
@@ -69,9 +69,11 @@ public class SubscrInitiatorBehaviour extends SubscriptionInitiator {
 		try {
 			content = myAgent.getContentManager().extractContent(inform);
 			action = ((Action)content).getAction();
-			SendMessage Message2 = (SendMessage) action;
-		    boolean Message3 = Message2.getMsgState().getState();
-			System.out.println("Received data: " + Message3);
+			Message message_received = (Message) action;
+		    boolean state_received = message_received.getState();
+		    double current_power_received = message_received.getCurrentPower();
+			double max_power_received = message_received.getMaxPower();
+			System.out.println("state_received: " + state_received + "; current_power_received: " + current_power_received + "; max_power_received: " + max_power_received);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

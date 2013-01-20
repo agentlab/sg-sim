@@ -1,7 +1,7 @@
 package behaviours;
 
 import ontologies.Electricity;
-import ontologies.SendMessage;
+import ontologies.Message;
 import ontologies.State;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -21,11 +21,14 @@ public class WindTurbineStateNotificationBehaviour extends TickerBehaviour {
 	@Override
 	protected void onTick() {
 		if(this.subManager != null) {
-			SendMessage sm = new SendMessage();
+			Message sm = new Message();
 			//ACLMessage sm = new ACLMessage(ACLMessage.INFORM);	
 			State state = new State();
 			state = subManager.windTurbine().getState();
-			sm.setMsg(state);
+			sm.setCurrentPower(state.getCurrentPower());
+			sm.setMaxPower(state.getMaxPower());
+			sm.setState(state.getState());
+			//sm.setMsg(state);
 			
 			subManager.handleChange(sm, "STATE");
 			

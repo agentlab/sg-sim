@@ -109,7 +109,7 @@ public class WindTurbineRequestResponderBehaviour extends AchieveREResponder {
 		
 		if(performed) {
 			ACLMessage inform = msg.createReply();
-			SendMessage sm = new SendMessage();
+			Message sm = new Message();
 			TimeDelay td = new TimeDelay();
 			td.setTime(windTurbine.time_delay());
 			System.out.println("Agent "+myAgent.getLocalName()+": Action successfully performed, time delay is " + windTurbine.time_delay());

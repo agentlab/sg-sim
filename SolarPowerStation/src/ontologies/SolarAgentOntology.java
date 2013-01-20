@@ -17,8 +17,8 @@ public class SolarAgentOntology extends BeanOntology {
 			add(Electricity.class);
 			add(TimeDelay.class);
 			add(State.class);
-			//add(Message.class);
-			add(SendMessage.class);
+			add(Message.class);
+			//add(SendMessage.class);
 			add(AssignPowerRequest.class);
 			add(BeginPowerTransitionRequest.class);
 		} 

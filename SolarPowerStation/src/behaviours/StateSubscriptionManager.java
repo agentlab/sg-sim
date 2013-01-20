@@ -24,10 +24,9 @@ import jade.domain.FIPANames;
 /**
  * This class serves all subscription operation form subscription responder side
  * After first subscriber registration it starts DataProcessingBehaviour.
- * 
  * It's methods called by jade.proto.SubscriptionResponder behaviour.
  */
-//������ - ������ �����������
+
 public class StateSubscriptionManager implements SubscriptionManager {
 	protected Vector<Subscription> subscriptions = new Vector<Subscription>();
 	protected sg_sim.SolarAgent myAgent;
@@ -35,7 +34,6 @@ public class StateSubscriptionManager implements SubscriptionManager {
 
 	/**
 	 * Constructor
-	 * 
 	 * @param agent
 	 */
 	public StateSubscriptionManager(SolarAgent agent) {
@@ -45,9 +43,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 
 	/**
 	 * register the subscription
-	 * 
-	 * @param sub
-	 *            - subscription data
+	 * @param sub - subscription data
 	 */
 	public boolean register(Subscription sub) throws RefuseException, NotUnderstoodException {
 		subscriptions.add(sub);
@@ -63,9 +59,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 
 	/**
 	 * deregister the subscription
-	 * 
-	 * @param sub
-	 *            - subscription data
+	 * @param sub- subscription data
 	 */
 	public boolean deregister(Subscription sub) throws FailureException {
 		subscriptions.remove(sub);
@@ -77,11 +71,9 @@ public class StateSubscriptionManager implements SubscriptionManager {
 	/**
 	 * Handle registrations/de-registrations/modifications by notifying
 	 * subscribed agents if necessary
-	 * 
-	 * @param someYourData
-	 *            - data to send
+	 * @param someYourData- data to send
 	 */
-	void handleChange(SendMessage msg, String type) {
+	void handleChange(Message msg, String type) {
 		for (Subscription sub : subscriptions) {
 			if(sub.getMessage().getConversationId().charAt(0) == '0' && type == "STATE") {
 				notify(sub, msg);
@@ -93,19 +85,15 @@ public class StateSubscriptionManager implements SubscriptionManager {
 		}
 	}
 
-	
 	private Codec codec = new SLCodec();
 	private Ontology ontology = SolarAgentOntology.getInstance();
 	
 	/**
 	 * Notifies subscriber with INFORM message
-	 * 
-	 * @param sub
-	 *            - subscription data
-	 * @param someYourData
-	 *            - data to send
+	 * @param sub- subscription data
+	 * @param someYourData- data to send
 	 */
-	private void notify(Subscription sub, SendMessage sm) {
+	private void notify(Subscription sub, Message sm) {
 		try {
 			ACLMessage notification = sub.getMessage().createReply();
 			myAgent.getContentManager().registerLanguage(codec); //регистрация языка и онтологии
@@ -114,7 +102,6 @@ public class StateSubscriptionManager implements SubscriptionManager {
 			notification.setLanguage(codec.getName());
 			notification.setOntology(ontology.getName());
 			notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-			//myAgent.getContentManager().registerOntology(FIPAManagementOntology.getInstance());
 			try {
 				myAgent.getContentManager().fillContent(notification, new Action(myAgent.getAID(), sm));
 			} catch (Exception e) {
@@ -130,9 +117,7 @@ public class StateSubscriptionManager implements SubscriptionManager {
 
 	/**
 	 * Sends to subscriber AGREE message
-	 * 
-	 * @param sub
-	 *            - subscription data
+	 * @param sub - subscription data
 	 */
 	private void confirm(Subscription sub) {
 		try {
