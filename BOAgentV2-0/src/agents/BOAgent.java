@@ -21,6 +21,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREInitiator;
 import jade.proto.ContractNetInitiator;
 
 public class BOAgent extends Agent {
@@ -64,7 +65,7 @@ public int rcnt=0;
 		
 		@Override
 		public void action() {
-			mtCS=MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME));
+			mtCS=MessageTemplate.and(MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME)),MessageTemplate.MatchConversationId("Evalue"));
 			ACLMessage receivecs=myAgent.receive(mtCS);
 			if (receivecs!=null){
 				InformMessage a;
@@ -213,10 +214,21 @@ public int rcnt=0;
 						
 						protected void handleInform(ACLMessage inform) {
 							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
-							ACLMessage modemsg=new ACLMessage(ACLMessage.INFORM);
-							modemsg.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
-							modemsg.setContent("normal");
-							send(modemsg);
+							//ACLMessage modemsg=new ACLMessage(ACLMessage.INFORM);
+							//modemsg.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
+							//modemsg.setContent("normal");
+							//send(modemsg);
+							
+							ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+							request.setContent("normal");
+							//request.setProtocol(FIPANames.InteractionProtocols.FIPA_REQUEST);
+							request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
+							myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
+							protected void handleInform(ACLMessage inform) { 
+							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "+inform); 
+							} 
+							});
+							
 						}
 					} );
 			}
