@@ -4,7 +4,7 @@ import behaviours.FindChargerBehaviour;
 import message.ControlAction;
 import message.ResponceAction;
 
-public class CleanerAgent extends ElectroVehicle {
+public class RobotCleanerAgent extends ElectroVehicle {
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ public class CleanerAgent extends ElectroVehicle {
 	//
 	private boolean can_work = true;
 	
-	public CleanerAgent()
+	public RobotCleanerAgent()
 	{
 		this.name = "CleanerAgent";
 		this.type = "ElectroVehicle";
