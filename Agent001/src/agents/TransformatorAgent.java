@@ -47,6 +47,7 @@ public class TransformatorAgent extends Agent {
 		subscribe();
 
 		// Printout a welcome message
+		//1
 		System.out.println("Agent " + getAID().getName() + " is ready.");
 	}
 
