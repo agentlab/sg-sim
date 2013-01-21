@@ -22,14 +22,14 @@ public class GeoTermTurbineStateNotificationBehaviour extends TickerBehaviour {
 		if(this.subManager != null) {
 			SendMessage sm = new SendMessage();
 			State state = subManager.GeoTermTurbine().getState();
-			sm.setMsg(state);
+			sm.setMsgState(state);//State
 			subManager.handleChange(sm, "STATE");
 			
 			SendMessage sm2 = new SendMessage();
 			Electricity electricity = new Electricity();
 			electricity.setAverPower(subManager.GeoTermTurbine().getCurrentPower());
 			electricity.setTime(3600);
-			sm2.setMsg(electricity);
+			sm2.setMsgEl(electricity);//EL
 			subManager.handleChange(sm, "ELECTRICITY");
 		}
 	}

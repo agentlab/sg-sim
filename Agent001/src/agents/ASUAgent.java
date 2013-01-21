@@ -10,6 +10,7 @@ import jade.content.onto.Ontology;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.domain.DFService;
 import jade.domain.AMSService;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.*;
@@ -22,37 +23,41 @@ public class ASUAgent extends Agent {
 	 * 
 	 */
 	private Codec codec = new SLCodec(); 
-	private Ontology ontology = GeoTermTurbOntology.getInstance(); //СЃРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂРѕРІ РєР»Р°СЃСЃРѕРІ РѕРЅС‚РѕР»РѕРіРёРё Рё СЏР·С‹РєР°
+	private Ontology ontology = GeoTermTurbOntology.getInstance(); //создание экземпляров классов онтологии и языка
 	
 	private static final long serialVersionUID = 6615714058341878330L; 
 	public void setup() { 
-		System.out.println("PseudoAlexAgent.setup()");
+		System.out.println("ASUAgent.setup()");
 		
-		getContentManager().registerLanguage(codec); //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЏР·С‹РєР° Рё РѕРЅС‚РѕР»РѕРіРёРё
+		getContentManager().registerLanguage(codec); //регистрация языка и онтологии
 		getContentManager().registerOntology(ontology);
 		
-		//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃРѕРѕР±С‰РµРЅРёСЏ
+		//конструктор сообщения
 		ACLMessage aclmsg = new ACLMessage(ACLMessage.REQUEST);		
 		AssignPowerRequest apr = new AssignPowerRequest();
-		apr.setAssignedPower(428500);
+		apr.setAssignedPower(8500);
 		
 		aclmsg.setLanguage(codec.getName());
 		aclmsg.setOntology(ontology.getName());
 		aclmsg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		aclmsg.setReplyByDate(new Date(System.currentTimeMillis() + 30000));
 		
-		AMSAgentDescription[] agents = null; 
+		DFAgentDescription[] agents = null; 
+		
 		try {
 			SearchConstraints c = new SearchConstraints();
 			c.setMaxResults(new Long(-1)); 
 			
-			agents = AMSService.search(this, new AMSAgentDescription(), c);
+			Thread.yield();
+			Thread.sleep(5000);
+			agents = DFService.search(this, new DFAgentDescription(), c);
+			//Thread.sleep(10000);
 		} catch (Exception e) {
 			System.out.println("Problem searching AMS: " + e);
 			e.printStackTrace();
 		}
 		
-		for (AMSAgentDescription agent : agents) {
+		for (DFAgentDescription agent : agents) {
 			
 			AID agentID = agent.getName();
 			

@@ -113,7 +113,9 @@ public class GeoTermTurbineRequestResponderBehaviour extends AchieveREResponder 
 			TimeDelay td = new TimeDelay();
 			td.setTime(GeoTermTurbine.time_delay());
 			System.out.println("Agent "+myAgent.getLocalName()+": Action successfully performed, time delay is " + GeoTermTurbine.time_delay());
-			sm.setMsg(td);
+			sm.setMsgTd(GeoTermTurbine.time_delay());
+			//sm.setMsg(td);
+			//sm.setMsgTd(powerplant.time_delay());
 			try {
 				myAgent.getContentManager().fillContent(inform, new Action(msg.getSender(), sm));
 			} catch (CodecException e) {

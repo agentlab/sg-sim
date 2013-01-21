@@ -9,30 +9,27 @@ public class SendMessage implements AgentAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 6876274843885978495L;
-	private Electricity msg_el;
-	private TimeDelay msg_td;
-	private State msg_state;
+	private Electricity msgEl;
+	private double msgTd;
+	private State msgState;
 	
 	
-	public Electricity getMsgElectro() {
-		return this.msg_el;
+	public Electricity getMsgEl() {
+		return msgEl;
 	}
-	
-	public TimeDelay getMsgTD() {
-		return this.msg_td;
+	public void setMsgEl(Electricity msgEl) {
+		this.msgEl = msgEl;
 	}
-	
+	public double getMsgTd() {
+		return msgTd;
+	}
+	public void setMsgTd(double msgTd) {
+		this.msgTd = msgTd;
+	}
 	public State getMsgState() {
-		return this.msg_state;
+		return msgState;
 	}
-	
-	public void setMsg(Electricity msg) {
-		this.msg_el = msg;
-	}
-	public void setMsg(State msg) {
-		this.msg_state = msg;
-	}
-	public void setMsg(TimeDelay msg) {
-		this.msg_td = msg;
+	public void setMsgState(State msgState) {
+		this.msgState = msgState;
 	}
 }
