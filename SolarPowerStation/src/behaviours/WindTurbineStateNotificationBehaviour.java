@@ -22,24 +22,8 @@ public class WindTurbineStateNotificationBehaviour extends TickerBehaviour {
 	protected void onTick() {
 		if(this.subManager != null) {
 			Message sm = new Message();
-			//ACLMessage sm = new ACLMessage(ACLMessage.INFORM);	
-			State state = new State();
-			state = subManager.windTurbine().getState();
-			sm.setCurrentPower(state.getCurrentPower());
-			sm.setMaxPower(state.getMaxPower());
-			sm.setState(state.getState());
-			//sm.setMsg(state);
-			
+			sm = subManager.windTurbine().getMessage();
 			subManager.handleChange(sm, "STATE");
-			
-			/*
-			SendMessage sm2 = new SendMessage();
-			//ACLMessage sm2 = new ACLMessage(ACLMessage.INFORM);	
-			Electricity electricity = new Electricity();
-			electricity.setAverPower(subManager.windTurbine().getCurrentPower());
-			electricity.setTime(3600);
-			sm2.setMsg(electricity);
-			subManager.handleChange(sm, "ELECTRICITY");*/
 		}
 	}
 }

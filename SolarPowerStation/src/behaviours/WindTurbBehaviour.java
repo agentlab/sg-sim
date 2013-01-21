@@ -65,6 +65,8 @@ public class WindTurbBehaviour extends TickerBehaviour {
 		}
 	}
 
+	
+	
 	@Override
 	public void onTick() {
 		System.out.print("Current Power: ");
@@ -73,6 +75,8 @@ public class WindTurbBehaviour extends TickerBehaviour {
 		System.out.println(this.assigned_power);
 		System.out.print("Time Delay: ");
 		System.out.println(this.time_delay());
+		
+		
 		if(isInTransition) {
 			System.out.println("Perfoming a transition step");
 			if(current_power != assigned_power) {
@@ -129,6 +133,14 @@ public class WindTurbBehaviour extends TickerBehaviour {
 		state.setMaxPower(this.max_power_calc());
 		state.setState((this.current_power > 0));
 		return state;
+	}
+	
+	public Message getMessage() {
+	Message sm = new Message();
+	sm.setCurrentPower(this.current_power);
+	sm.setMaxPower(this.assigned_power);
+	sm.setState((this.current_power > 0));
+	return sm;
 	}
 	
 	public double getCurrentPower() {
