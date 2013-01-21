@@ -34,7 +34,7 @@ public class ASUAgent extends Agent {
 		//конструктор сообщения
 		ACLMessage aclmsg = new ACLMessage(ACLMessage.REQUEST);		
 		AssignPowerRequest apr = new AssignPowerRequest();
-		apr.setAssignedPower(428500);
+		apr.setAssignedPower(299698.891365624);
 		
 		aclmsg.setLanguage(codec.getName());
 		aclmsg.setOntology(ontology.getName());

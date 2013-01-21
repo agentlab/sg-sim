@@ -21,7 +21,7 @@ public class GeoTermTurbBehaviour extends TickerBehaviour {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int GeoTermSpeed;
+	private int GeoTermTemp;
 	private double airDensity;
 	private int length;
 	private double bLimit;
@@ -38,7 +38,7 @@ public class GeoTermTurbBehaviour extends TickerBehaviour {
 		this.airDensity=airdens;
 		this.bLimit=blim;
 		this.length=leng;
-		this.GeoTermSpeed=GeoTermsp;
+		this.GeoTermTemp=GeoTermsp;
 		current_power=max_power_calc();
 		this.assigned_power=this.current_power;
 		this.subManager=subManager;
@@ -124,7 +124,7 @@ public class GeoTermTurbBehaviour extends TickerBehaviour {
 	public double max_power_calc ()
 	{
 		double swept_area=this.length*this.length*Math.PI;
-		return 0.5*swept_area*this.airDensity*this.bLimit*Math.pow(GeoTermSpeed, 3);
+		return 0.5*swept_area*this.airDensity*this.bLimit*Math.pow(GeoTermTemp, 2);
 	}
 
 	public double time_delay() {
