@@ -1,6 +1,9 @@
 package behaviours;
 
 import sg_sim.Transformator;
+import jade.content.lang.Codec;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.Ontology;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -10,6 +13,7 @@ import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.FIPAManagementVocabulary;
 import jade.lang.acl.ACLMessage;
+import ontologies.*;
 
 /**
  * This behaviour searches for first agent which matches template.
@@ -19,7 +23,7 @@ import jade.lang.acl.ACLMessage;
  */
 public class RegisterBehaviour extends TickerBehaviour {
 	private static final long serialVersionUID = 3384651319762649616L;
-	
+	private Ontology ontology = NuclearPowerPlantBlockOntology.getInstance(); 
 	protected DFAgentDescription template;
 
 	/**
@@ -52,7 +56,7 @@ public class RegisterBehaviour extends TickerBehaviour {
 				subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
 				// Note that iota is not included in SL0
 				subscribe.setLanguage(FIPANames.ContentLanguage.FIPA_SL);
-				
+				subscribe.setOntology(ontology.getName());
 				// create StubscriptionInitiator behaviour
 				myAgent.addBehaviour(new SubscrInitiatorBehaviour((Transformator)myAgent, subscribe));
 				

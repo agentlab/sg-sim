@@ -22,14 +22,14 @@ public class NuclearAgentStateNotificationBehaviour extends TickerBehaviour {
 		if(this.subManager != null) {
 			SendMessage sm = new SendMessage();
 			State state = subManager.windTurbine().getState();
-			sm.setMsg(state);
+			sm.setMsgState(state);
 			subManager.handleChange(sm, "STATE");
 			
 			SendMessage sm2 = new SendMessage();
 			Electricity electricity = new Electricity();
 			electricity.setAverPower(subManager.windTurbine().getCurrentPower());
 			electricity.setTime(3600);
-			sm2.setMsg(electricity);
+			sm2.setMsgEl(electricity);
 			subManager.handleChange(sm, "ELECTRICITY");
 		}
 	}
