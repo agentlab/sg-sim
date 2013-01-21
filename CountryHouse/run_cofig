@@ -1,0 +1,2 @@
+-gui
+CountryHouse:agents.CountryHouse;Consumer1:agents.CustomerAgent;Consumer2:agents.CustomerAgent;NRJStationAgent:agents.NRJStationAgent
