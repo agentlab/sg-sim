@@ -12,6 +12,7 @@ public class TimeDelay implements Concept {
 	
 	public double getTimeDelay() {
 		return this.time;
+		
 	}
 
 	
