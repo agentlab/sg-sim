@@ -10,6 +10,6 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui&#13;&#10;charger:agents.ChargerAgent;cleaner:agents.CleanerAgent;cleanercontrol:agents.ControlAgent(CleanerAgent);"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui&#13;&#10;charger:agents.ChargerAgent;cleaner:agents.RobotCleanerAgent;cleanercontrol:agents.ControlAgent(RobotCleanerAgent);"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="RobotCleanerAgent"/>
 </launchConfiguration>
