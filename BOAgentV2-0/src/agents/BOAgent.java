@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+
+
 import Ontology.InformMessage;
 import Ontology.RequestOntology;
 
@@ -21,7 +23,9 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREInitiator;
 import jade.proto.ContractNetInitiator;
+import jade.proto.SubscriptionInitiator;
 
 public class BOAgent extends Agent {
 /**
@@ -42,12 +46,59 @@ public int rcnt=0;
   		addBehaviour(new ReceiveFromCSAgent(this));
 		
   	
-		
+  		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
+		subscribe.setLanguage(new SLCodec().getName());
+		subscribe.setOntology(RequestOntology.getInstance().getName());
+		subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+		subscribe.setContent("Volume");
+		subscribe.addReceiver((new AID("CSAgent", AID.ISLOCALNAME)));
+		this.addBehaviour(new BOAgentSubscrInit(this,subscribe));
   		
   		// Fill the CFP message
   		
   	
   }
+	private class BOAgentSubscrInit extends SubscriptionInitiator{
+
+		public BOAgentSubscrInit(Agent a, ACLMessage msg) {
+			super(a, msg);
+			// TODO Auto-generated constructor stub
+		}
+
+
+		/**
+		 * 
+		 */
+		
+		@Override
+		protected void handleRefuse(ACLMessage refuse) {
+			/**
+			 * 
+			 */
+			System.out.println("Warning. Controller "+refuse.getSender().getName()+" refused subscription.");
+		}
+		@Override
+		protected void handleInform(ACLMessage msg) {
+			/**
+			 * handle recieved notification message
+			 */
+
+			// TODO Auto-generated method stub
+			//mt=MessageTemplate.and(MessageTemplate.MatchSender(new AID("RetailBroker",AID.ISLOCALNAME)),MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			
+			if (msg!=null){
+				
+			}
+			
+					
+		}
+		
+		
+		
+	
+		
+		
+	}
 	private class ReceiveFromCSAgent extends CyclicBehaviour {
 		
 		/**
@@ -64,7 +115,7 @@ public int rcnt=0;
 		
 		@Override
 		public void action() {
-			mtCS=MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME));
+			mtCS=MessageTemplate.and(MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME)),MessageTemplate.MatchConversationId("Evalue"));
 			ACLMessage receivecs=myAgent.receive(mtCS);
 			if (receivecs!=null){
 				InformMessage a;
@@ -213,10 +264,21 @@ public int rcnt=0;
 						
 						protected void handleInform(ACLMessage inform) {
 							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
-							ACLMessage modemsg=new ACLMessage(ACLMessage.INFORM);
-							modemsg.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
-							modemsg.setContent("normal");
-							send(modemsg);
+							//ACLMessage modemsg=new ACLMessage(ACLMessage.INFORM);
+							//modemsg.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
+							//modemsg.setContent("normal");
+							//send(modemsg);
+							
+							ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+							request.setContent("normal");
+							//request.setProtocol(FIPANames.InteractionProtocols.FIPA_REQUEST);
+							request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
+							myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
+							protected void handleInform(ACLMessage inform) { 
+							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "+inform); 
+							} 
+							});
+							
 						}
 					} );
 			}
