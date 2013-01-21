@@ -1,5 +1,9 @@
 package agents;
 
+
+import java.util.Vector;
+
+
 import Ontology.InformMessage;
 import Ontology.RequestOntology;
 import jade.content.lang.Codec.CodecException;
@@ -28,6 +32,7 @@ public class CSAgent extends Agent {
 	private static final long serialVersionUID = -2369928645280712754L;
 	public String EValue;
 	public Subscription sub;
+	private Vector<Subscription> subscribers = new Vector<Subscription>();
 	//Основной метод агента
 	protected void setup() {
 		
@@ -71,16 +76,15 @@ public class CSAgent extends Agent {
 		}
 
 		@Override
-		public boolean register(Subscription s) throws RefuseException,
-		NotUnderstoodException {
+		public boolean register(Subscription s) throws RefuseException,	NotUnderstoodException {
 			boolean result=false;
-
+			
 			if(s.getMessage().getContent().equalsIgnoreCase("Volume")){
 				agent.sub=s;
 				//System.out.println(controller.getLocalName()+": received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
 
 				//add behavior for sending one hour notifications
-
+				subscribers.add(sub);
 				agent.addBehaviour(new TickerBehaviour(agent,
 						10000) {
 					/**
@@ -94,6 +98,7 @@ public class CSAgent extends Agent {
 						// Update the list of seller agents
 						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 						msg.addReceiver(new AID("BOAgent", AID.ISLOCALNAME));
+						msg.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
 						msg.setConversationId("Evalue");
 						msg.setLanguage(new SLCodec().getName());	
 						msg.setOntology(RequestOntology.getInstance().getName());
@@ -121,11 +126,15 @@ public class CSAgent extends Agent {
 			}
 			return result;
 		}
+		
+		
+		
 		private void confirm(Subscription sub) 
 		{
 			try 
 			{
 				ACLMessage notification = sub.getMessage().createReply();
+				
 				notification.setPerformative(ACLMessage.AGREE);
 				sub.notify(notification);												// Send message
 			

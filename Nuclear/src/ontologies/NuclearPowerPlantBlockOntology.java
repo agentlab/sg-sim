@@ -6,7 +6,7 @@ import jade.content.onto.OntologyException;
 
 public class NuclearPowerPlantBlockOntology extends BeanOntology {
 	
-	public static final String ONTOLOGY_NAME = "Wind_Turbine_Ontology";
+	public static final String ONTOLOGY_NAME = "NuclearPowerPlantBlockOntology";
 	private static Ontology instance = new NuclearPowerPlantBlockOntology(ONTOLOGY_NAME);
 	public static Ontology getInstance() { return instance; }
 

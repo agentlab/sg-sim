@@ -35,6 +35,7 @@ public class NuclearBlock extends Agent {
 	private int p2=52;
 	private double bLimit=0.4;
 	public void setup() { 
+		
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
