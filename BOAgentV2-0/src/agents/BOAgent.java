@@ -264,18 +264,14 @@ public int rcnt=0;
 						
 						protected void handleInform(ACLMessage inform) {
 							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
-							//ACLMessage modemsg=new ACLMessage(ACLMessage.INFORM);
-							//modemsg.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
-							//modemsg.setContent("normal");
-							//send(modemsg);
-							
+								
 							ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
 							request.setContent("normal");
-							//request.setProtocol(FIPANames.InteractionProtocols.FIPA_REQUEST);
+							request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 							request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
 							myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
 							protected void handleInform(ACLMessage inform) { 
-							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "+inform); 
+							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "); 
 							} 
 							});
 							
