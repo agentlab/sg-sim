@@ -12,5 +12,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui&#13;&#10;CSAgent:agents.CSAgent(100);BOAgent:agents.BOAgent;Broker1:agents.Broker(100,200);Broker2:agents.Broker(150,300)"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="BOAgentV2-0"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="BuildingOwnerAgentV2"/>
 </launchConfiguration>
