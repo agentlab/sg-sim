@@ -10,7 +10,7 @@ import jade.content.onto.Ontology;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.AMSService;
+import jade.domain.DFService;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.*;
 
@@ -23,7 +23,7 @@ public class SolarControlAgent extends Agent {
 	
 	private static final long serialVersionUID = 6615714058341878330L; 
 	public void setup() { 
-		System.out.println("PseudoAlexAgent.setup()");
+		System.out.println("SolarControlAgent.setup()");
 		
 		getContentManager().registerLanguage(codec); //регистрация языка и онтологии
 		getContentManager().registerOntology(ontology);
@@ -38,18 +38,18 @@ public class SolarControlAgent extends Agent {
 		aclmsg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		aclmsg.setReplyByDate(new Date(System.currentTimeMillis() + 30000));
 		
-		AMSAgentDescription[] agents = null; 
+		DFAgentDescription[] agents = null; 
 		try {
 			SearchConstraints c = new SearchConstraints();
 			c.setMaxResults(new Long(-1)); 
 			
-			agents = AMSService.search(this, new AMSAgentDescription(), c);
+			agents = DFService.search(this, new DFAgentDescription(), c);
 		} catch (Exception e) {
-			System.out.println("Problem searching AMS: " + e);
+			System.out.println("Problem searching DF: " + e);
 			e.printStackTrace();
 		}
 		
-		for (AMSAgentDescription agent : agents) {
+		for (DFAgentDescription agent : agents) {
 			
 			AID agentID = agent.getName();
 			
