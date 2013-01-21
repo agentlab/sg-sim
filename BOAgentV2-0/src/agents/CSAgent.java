@@ -5,11 +5,15 @@ import Ontology.RequestOntology;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
+import jade.content.onto.UngroundedException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREResponder;
 
 public class CSAgent extends Agent {
 	/**
@@ -22,6 +26,7 @@ public class CSAgent extends Agent {
 		System.out.println("Control System Agent "+getAID().getName()+" is ready.");
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(RequestOntology.getInstance());
+		this.createResponder();
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			EValue =  (String) args[0];
@@ -39,6 +44,7 @@ public class CSAgent extends Agent {
 					// Update the list of seller agents
 					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 					msg.addReceiver(new AID("BOAgent", AID.ISLOCALNAME));
+					msg.setConversationId("Evalue");
 					msg.setLanguage(new SLCodec().getName());	
 					msg.setOntology(RequestOntology.getInstance().getName());
 					InformMessage imsg = new InformMessage();
@@ -53,7 +59,7 @@ public class CSAgent extends Agent {
 						e.printStackTrace();
 					}
 					send(msg);
-					addBehaviour(new Receiver());
+					//addBehaviour(new Receiver());
 				} 
 			} );
 		}
@@ -64,25 +70,21 @@ public class CSAgent extends Agent {
 		}
 	}
 	
-	//Поведение для принятия режима
-	private class Receiver extends CyclicBehaviour {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 75873930823995368L;
-
-		@Override
-		public void action() {
-			// TODO Auto-generated method stub
-			ACLMessage msg= myAgent.receive();
-			if (msg!=null) {
-				System.out.println("Mode was received, work mode is "+msg.getContent());
-				
-			}			
-			else {
-				block();
-			}
-		}
+		
+	private void createResponder() {
+		MessageTemplate mtr = MessageTemplate.and(MessageTemplate.MatchSender(new AID("BOAgent", AID.ISLOCALNAME)), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));//AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		this.addBehaviour(new AchieveREResponder(this, mtr)
+						  {
+							private static final long serialVersionUID = 99691474816159152L;
+							private Broker agent;
+							protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+							   {
+								System.out.println("Mode was receiver. Workmode is: " + request.getContent());	
+								ACLMessage informDone = request.createReply(); 
+								informDone.setPerformative(ACLMessage.INFORM); 
+								informDone.setContent("inform done");
+								return informDone;
+							   }
+						  });
 	}
 }
