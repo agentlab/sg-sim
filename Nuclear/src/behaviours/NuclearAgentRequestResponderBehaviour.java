@@ -113,7 +113,7 @@ public class NuclearAgentRequestResponderBehaviour extends AchieveREResponder {
 			TimeDelay td = new TimeDelay();
 			td.setTime(Nuclear.time_delay());
 			System.out.println("Agent "+myAgent.getLocalName()+": Action successfully performed, time delay is " + Nuclear.time_delay());
-			sm.setMsg(td);
+			sm.setMsgTd(Nuclear.time_delay());
 			try {
 				myAgent.getContentManager().fillContent(inform, new Action(msg.getSender(), sm));
 			} catch (CodecException e) {
