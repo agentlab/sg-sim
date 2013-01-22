@@ -2,16 +2,13 @@ package ru.bmstu.agents;
 
 import java.io.IOException;
 import java.util.Random;
-
 import org.apache.log4j.Logger;
-
 import ru.bmstu.objectToSell.Electricity;
 import ru.bmstu.ontology.Energy;
 import ru.bmstu.ontology.EnergyOntology;
 import ru.bmstu.protocols.BrokeringInitiator;
 import ru.bmstu.protocols.BrokeringResponder;
 import ru.bmstu.simpleObj.ToSendObject;
-
 import jade.content.AgentAction;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -51,16 +48,13 @@ public class BrokerAgent extends Agent {
 	int priceForBuy=0;
 	Electricity energy=new Electricity(0, 0);
 
-
 	public void setup() {
 		getContentManager().registerLanguage(codec);
 	    getContentManager().registerOntology(ontology);
 		System.out.println("Hello World, my name is : " + getAID().getName());
 		
-		
 		addBehaviour(new TickerBehaviour(this,new Long(2000))
 		{
-			
 			@Override
 			protected void onTick() {//проверяет сколько энергии осталось и докупает ее и подводит итоги
 				
@@ -107,7 +101,7 @@ public class BrokerAgent extends Agent {
 							e.printStackTrace();
 						}
 				    Energy mo = (Energy)((Action)content).getAction();
-				    
+	    
 					String quantity_to_sail= mo.getNeedToBuy();
 					System.out.println(msg.getConversationId()+" hochet kupit "+quantity_to_sail);
 					System.out.println("tekushaya cena"+ msg.getConversationId() +" "+energy.getPrice());
@@ -154,10 +148,7 @@ public class BrokerAgent extends Agent {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 			}
 		});
-		
-
 	}
 }
