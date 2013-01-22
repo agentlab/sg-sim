@@ -77,24 +77,7 @@ public int rcnt=0;
 			 */
 			System.out.println("Warning. Controller "+refuse.getSender().getName()+" refused subscription.");
 		}
-		@Override
-		protected void handleInform(ACLMessage msg) {
-			/**
-			 * handle recieved notification message
-			 */
-
-			// TODO Auto-generated method stub
-			//mt=MessageTemplate.and(MessageTemplate.MatchSender(new AID("RetailBroker",AID.ISLOCALNAME)),MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 			
-			if (msg!=null){
-				
-			}
-			
-					
-		}
-		
-		
-		
 	
 		
 		
