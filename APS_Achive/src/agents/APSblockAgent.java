@@ -24,6 +24,7 @@ import jade.proto.SubscriptionResponder.Subscription;
 public class APSblockAgent extends Agent {
 	/**
 	 * 
+	 * 
 	 */
 	private static final long serialVersionUID = -7838901911691186799L;
 	private APSblockDescriptor params=new APSblockDescriptor(null, 100+10*(Math.random()-0.1), 1000+100*(Math.random()-0.1),  BlockState.Passive);
