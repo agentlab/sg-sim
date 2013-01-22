@@ -30,7 +30,7 @@ public class TransformatorAgent extends Agent {
 		// Printout a welcome message
 		System.out.println(getAID().getName() + " started.");
 
-		// Register the service in the yellow pages
+		// Register the service in the yellow pages1
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType(type);
 		sd.setName(name);
