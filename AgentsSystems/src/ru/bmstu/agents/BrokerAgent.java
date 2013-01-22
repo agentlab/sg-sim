@@ -147,6 +147,7 @@ public class BrokerAgent extends Agent {
 				} catch (OntologyException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					
 				}
 			}
 		});
