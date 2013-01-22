@@ -1,201 +1,284 @@
 package agents;
 
-import jade.domain.DFService;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
+
+
+
 import Ontology.InformMessage;
 import Ontology.RequestOntology;
+
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.UngroundedException;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.*;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.AchieveREResponder;
+import jade.proto.AchieveREInitiator;
+import jade.proto.ContractNetInitiator;
+import jade.proto.SubscriptionInitiator;
 
 public class ProducerAgent extends Agent {
-	
-	/**
+/**
 	 * 
 	 */
-	private static final long serialVersionUID = -741223470022374171L;
-	private AID[] brokerAgents;
-	public int Evalue;
-	private int price=100;
-	private int volume;
-	private ProducerAgent agent;
-	public AID bestBuyer;
-	public int bestPrice;
-	//public int cnt=0;
-	
+	private static final long serialVersionUID = 5238728634416626059L;
+private int nResponders;
+private String volume;
+private AID[] brokeragents;
+private ProducerAgent a;
+public int rcnt=0;
 	protected void setup() {
-		// Printout a welcome message
-		System.out.println("Building owner agent "+getAID().getName()+" is ready.");
-		this.getContentManager().registerLanguage(new SLCodec());					//registracia yazika
-		this.getContentManager().registerOntology(RequestOntology.getInstance());	//registracia ontologii
-		this.createResponder();
+  	
+  	
+		System.out.println("Producer Agent "+getAID().getName()+" is ready.");
+		this.getContentManager().registerLanguage(new SLCodec());
+		this.getContentManager().registerOntology(RequestOntology.getInstance());
+  		addBehaviour(new ReceiveFromCSAgent(this));
 		
-		// Dobavlenie povedenia
-		addBehaviour(new OfferRequestsServer());			
-	}
-	
-	//Povedenie dlya priema soobsheniy
-		private class OfferRequestsServer extends CyclicBehaviour {
-			
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = -355534649660658438L;
-			private MessageTemplate mt;
-			
-			public void action() {
-				mt = MessageTemplate.MatchSender(new AID("CSAgent",AID.ISLOCALNAME));
-				ACLMessage msg = myAgent.receive(mt);
-				if (msg != null) {
-					// CFP Message received. Process it
-					Evalue = Integer.parseInt(msg.getContent());
-					System.out.println("BOAgent: Receive energy value "+Evalue);
-					addBehaviour(new SendBehaviour());
-				}
-				else {
-					block();
-				}
-			}	
+  	
+  		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
+		subscribe.setLanguage(new SLCodec().getName());
+		subscribe.setOntology(RequestOntology.getInstance().getName());
+		subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+		subscribe.setContent("Volume");
+		subscribe.addReceiver((new AID("CSAgent", AID.ISLOCALNAME)));
+		this.addBehaviour(new ProducerAgentSubscrInit(this,subscribe));
+  		
+  		// Fill the CFP message
+  		
+  	
+  }
+	private class ProducerAgentSubscrInit extends SubscriptionInitiator{
+
+		public ProducerAgentSubscrInit(Agent a, ACLMessage msg) {
+			super(a, msg);
+			// TODO Auto-generated constructor stub
 		}
 
-	private class SendBehaviour extends OneShotBehaviour {
+
 		/**
 		 * 
 		 */
-		private static final long serialVersionUID = 3363745877621540494L;
-		int step=0;
-		private MessageTemplate mt;		
-		private int repliesCnt = 0;
 		
-		
-		public void action(){
-			mt=MessageTemplate.MatchConversationId("energy-selling");
-			
-			//Poisk Brokerov
-			DFAgentDescription template = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType("energy-selling");
-			template.addServices(sd);
-			try {
-				DFAgentDescription[] result = DFService.search(myAgent, template); 
-				System.out.println("Found the following seller agents:");
-				brokerAgents = new AID[result.length];
-				for (int i = 0; i < result.length; ++i) {
-					brokerAgents[i] = result[i].getName();
-					System.out.println(brokerAgents[i].getName());
-				}
-			}
-			catch (FIPAException fe) {
-				fe.printStackTrace();
-			}				
-			//Otpravka zaprosa ceni i ob'ema
-				
-					ACLMessage request = new ACLMessage (ACLMessage.REQUEST);
-					for (int i=0;i<brokerAgents.length;i++) {
-						request.addReceiver(brokerAgents[i]);
-					}
-					request.setContent("get-price-and-volume");
-					send(request);			
-		}		
-	}
-	
-	
-	private void createResponder()	
-	{
-		MessageTemplate mtr = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-		this.addBehaviour(new AchieveREResponder(this, mtr) {						  
-			private static final long serialVersionUID = 99691474816159152L;
-			private ProducerAgent agent;
-			private int cnt=0;
-			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {				  
-				  	try {
-						InformMessage a =  (InformMessage)getContentManager().extractContent(request);										
-						if (a instanceof InformMessage) {										
-							price=a.getPrice();
-							volume=a.getVolume();
-							if (bestBuyer == null || (price > bestPrice)) {
-								bestPrice = price;
-								bestBuyer = request.getSender();
-								
-							}							
-						}									
-					} 
-					catch (UngroundedException e) {					
-						e.printStackTrace();
-					} 
-					catch (CodecException e) {									
-						e.printStackTrace();
-					} 
-					catch (OntologyException e) {									
-						e.printStackTrace();
-					} 								    
-					ACLMessage informDone = request.createReply();
-					informDone.setPerformative(ACLMessage.INFORM);
-					informDone.setContent("Values received");								   
-					cnt++;
-					if (cnt==brokerAgents.length) {
-						addBehaviour(new SendCFP());
-						cnt=0;
-					}
-					return informDone;					
-			}							
-		});
-	}
-	
-	private class SendCFP extends OneShotBehaviour {
-		
-		private MessageTemplate mt;
-		public void action() {
-			//switch (step){
-			//case 0:
-				ACLMessage cfp = new ACLMessage(ACLMessage.CFP);			
-				cfp.addReceiver(bestBuyer);			
-				cfp.setContent("Buy-Request");				
-				cfp.setReplyWith("cfp"+System.currentTimeMillis());
-				cfp.setConversationId("energy-selling");
-				myAgent.send(cfp);
-				//mt = MessageTemplate.and(MessageTemplate.MatchConversationId("energy-selling"),
-				//		MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
-				addBehaviour(new ReceiveCFPReply());
-						
-				
-			
-			}			
-		//}
-	}
-	private class ReceiveCFPReply extends CyclicBehaviour{
-		
+		@Override
+		protected void handleRefuse(ACLMessage refuse) {
+			/**
+			 * 
+			 */
+			System.out.println("Warning. Controller "+refuse.getSender().getName()+" refused subscription.");
+		}
+		@Override
+		protected void handleInform(ACLMessage msg) {
+			/**
+			 * handle recieved notification message
+			 */
 
+			// TODO Auto-generated method stub
+			//mt=MessageTemplate.and(MessageTemplate.MatchSender(new AID("RetailBroker",AID.ISLOCALNAME)),MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			
+			if (msg!=null){
+				
+			}
+			
+					
+		}
+		
+		
+		
+	
+		
+		
+	}
+	private class ReceiveFromCSAgent extends CyclicBehaviour {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4475845021867741580L;
+		private MessageTemplate mtCS;
+		private ProducerAgent agent;
+		
+		//Конструктор
+		public ReceiveFromCSAgent(ProducerAgent a) {
+			this.agent=a;
+		}
+		
 		@Override
 		public void action() {
-			// TODO Auto-generated method stub
-			ACLMessage reply=myAgent.receive();
-			
-			if (reply!=null) {
-				ACLMessage mode=new ACLMessage(ACLMessage.INFORM);
-				mode.addReceiver(new AID("CSAgent",AID.ISLOCALNAME));
-				if (reply.getPerformative()==ACLMessage.PROPOSE) {
-					mode.setContent("normal");
+			mtCS=MessageTemplate.and(MessageTemplate.MatchSender(new AID("CSAgent", AID.ISLOCALNAME)),MessageTemplate.MatchConversationId("Evalue"));
+			ACLMessage receivecs=myAgent.receive(mtCS);
+			if (receivecs!=null){
+				InformMessage a;
+				try {
+					a = (InformMessage)getContentManager().extractContent(receivecs);
+					volume=String.valueOf(a.getVolume());
+				} catch (UngroundedException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (CodecException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (OntologyException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
 				}
-				else {
-					mode.setContent("econom");
+				
+				//Поиск брокеров на желтых страницах
+				DFAgentDescription template = new DFAgentDescription();
+				ServiceDescription sd = new ServiceDescription();
+				sd.setType("energy-selling");
+				template.addServices(sd);
+				try {
+					DFAgentDescription[] result = DFService.search(myAgent, template); 
+					System.out.println("Found the following seller agents:");
+					brokeragents = new AID[result.length];
+					for (int i = 0; i < result.length; ++i) {
+						brokeragents[i] = result[i].getName();
+						System.out.println(brokeragents[i].getName());
+					}
 				}
-				myAgent.send(mode);
-			}
-			else {
-				block();
+				catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
+				
+				ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+		  		for (int i = 0; i < brokeragents.length; ++i) {
+		  			msg.addReceiver(brokeragents[i]);
+		  		}
+					msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+					
+					// We want to receive a reply in 10 secs
+					msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+					
+					msg.setConversationId("price-request");
+					
+					msg.setLanguage(new SLCodec().getName());	
+					msg.setOntology(RequestOntology.getInstance().getName());
+					InformMessage imsg = new InformMessage();
+					imsg.setVolume(Integer.parseInt(volume));
+					try {
+						((ProducerAgent)myAgent).getContentManager().fillContent(msg, imsg);
+					} catch (CodecException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (OntologyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					addBehaviour(new ContractNetInitiator(this.agent, msg) {
+						
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 4290227958411834245L;
+
+						protected void handlePropose(ACLMessage propose, Vector v) {
+							System.out.println("Agent "+propose.getSender().getName()+" proposed "+propose.getContent());
+						}
+						
+						protected void handleRefuse(ACLMessage refuse) {
+							
+							System.out.println("Agent "+refuse.getSender().getName()+" refused");
+							rcnt++;
+							if (rcnt==brokeragents.length){
+								ACLMessage csmsg=new ACLMessage(ACLMessage.INFORM);
+								csmsg.setContent("econom");
+								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
+								send(csmsg);
+								rcnt=0;
+							}
+						}
+						
+						protected void handleFailure(ACLMessage failure) {
+							if (failure.getSender().equals(myAgent.getAMS())) {
+								// FAILURE notification from the JADE runtime: the receiver
+								// does not exist
+								System.out.println("Responder does not exist");
+								ACLMessage csmsg= new ACLMessage(ACLMessage.INFORM);
+								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
+								csmsg.setContent("econom");
+								send(csmsg);
+							}
+							else {
+								System.out.println("Agent "+failure.getSender().getName()+" failed");
+							}
+							// Immediate failure --> we will not receive a response from this agent
+							
+						}
+						
+						protected void handleAllResponses(Vector responses, Vector acceptances) {
+							if (responses.size() < brokeragents.length) {
+								// Some responder didn't reply within the specified timeout
+								System.out.println("Timeout expired: missing "+(nResponders - responses.size())+" responses");
+							}
+							// Evaluate proposals.
+							int bestProposal = -1;
+							AID bestProposer = null;
+							ACLMessage accept = null;
+							Enumeration e = responses.elements();
+							while (e.hasMoreElements()) {
+								ACLMessage msg = (ACLMessage) e.nextElement();
+								if (msg.getPerformative() == ACLMessage.PROPOSE) {
+									ACLMessage reply = msg.createReply();
+									reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+									acceptances.addElement(reply);
+									try {
+										InformMessage a =  (InformMessage)getContentManager().extractContent(msg);										
+										int proposal=a.getPrice();
+										if (proposal > bestProposal) {
+											bestProposal = proposal;
+											bestProposer = msg.getSender();
+											accept = reply;
+										}
+									} 
+									catch (UngroundedException e1) {					
+										e1.printStackTrace();
+									} 
+									catch (CodecException e1) {									
+										e1.printStackTrace();
+									} 
+									catch (OntologyException e1) {									
+										e1.printStackTrace();
+									}
+									
+									
+								}
+							}
+							// Accept the proposal of the best proposer
+							if (accept != null) {
+								System.out.println("Accepting proposal "+bestProposal+" from responder "+bestProposer.getName());
+								accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+							}						
+						}
+						
+						protected void handleInform(ACLMessage inform) {
+							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
+								
+							ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+							request.setContent("normal");
+							request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+							request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
+							myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
+							protected void handleInform(ACLMessage inform) { 
+							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "); 
+							} 
+							});
+							
+						}
+					} );
 			}
 		}
+		
 	}
-	
 }
