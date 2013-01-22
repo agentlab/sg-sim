@@ -29,7 +29,7 @@ public class ASUAgent extends Agent {
 	public void setup() { 
 		System.out.println("ASUAgent.setup()");
 		
-		getContentManager().registerLanguage(codec); //регистрация языка и онтологии
+		getContentManager().registerLanguage(codec); //регистрация. языка и онтологии
 		getContentManager().registerOntology(ontology);
 		
 		//конструктор сообщения
