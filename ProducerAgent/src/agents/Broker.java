@@ -6,33 +6,29 @@ import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.UngroundedException;
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.AchieveREInitiator;
+import jade.proto.ContractNetResponder;
 
 public class Broker extends Agent {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7914134039610895896L;
-	private String price;
-	private String volume;
-	
-	private Broker agent;
-	
+	private static final long serialVersionUID = 7779532957753246851L;
+	public String price;
+	public String volume;
+	public String Evalue;
 	protected void setup() {
-		// Printout a welcome message
-		System.out.println("Broker Agent "+getAID().getName()+" is ready.");
+		System.out.println("Agent "+getLocalName()+" waiting for CFP...");
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(RequestOntology.getInstance());
 		
@@ -58,102 +54,81 @@ public class Broker extends Agent {
 			System.out.println(getAID().getName()+" No available arguments");
 			doDelete();
 		}
-		addBehaviour(new BOReply(this));
-	}
+		
+		MessageTemplate template = MessageTemplate.and(
+				MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+				MessageTemplate.MatchPerformative(ACLMessage.CFP) );
 
-	private class BOReply extends CyclicBehaviour {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1845815847183794626L;
-		private Broker agent;
-		private MessageTemplate mt;
-		
-		
-		public BOReply(Broker a) {
-			// TODO Auto-generated constructor stub
-			this.agent=a;
-		}
-		
-		public void action() {
-			mt=MessageTemplate.and(MessageTemplate.MatchSender(new AID("ProducerAgent",AID.ISLOCALNAME)),MessageTemplate.MatchContent("get-price-and-volume"));
-			ACLMessage msg = myAgent.receive(mt);			
-			if (msg != null ) {
-				System.out.println("receive from BO: "+msg.getContent());
-				addBehaviour(new SendMsg(this.agent));
-				addBehaviour(new ReplyCFP());
-			}			
-			else {
-				block();
+		addBehaviour(new ContractNetResponder(this, template) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -8436872907122692247L;
+			//private Broker agent=(Broker)myAgent;
+			
+			
+			@Override
+			protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
+				InformMessage a;
+				System.out.println("Agent "+getLocalName()+": CFP received from "+cfp.getSender().getName()+". Action is "+cfp.getConversationId());
+				try {
+					a = (InformMessage)getContentManager().extractContent(cfp);
+					Evalue=String.valueOf(a.getVolume());
+				} catch (UngroundedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (CodecException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (OntologyException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				if (Integer.parseInt(Evalue)<Integer.parseInt(volume)) {
+					// We provide a proposal
+					System.out.println("Agent "+getLocalName()+": Proposing "+price);
+					ACLMessage propose = cfp.createReply();
+					propose.setOntology(RequestOntology.getInstance().getName());
+					InformMessage imessage = new InformMessage();
+					imessage.setPrice(Integer.parseInt(price));
+					imessage.setVolume(Integer.parseInt(volume));
+					propose.setPerformative(ACLMessage.PROPOSE);
+					propose.setContent(price);
+					try {
+						myAgent.getContentManager().fillContent(propose, imessage);
+					} catch (CodecException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (OntologyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					return propose;
+				}
+				else {
+					// We refuse to provide a proposal
+					System.out.println("Agent "+getLocalName()+": Refuse");
+					throw new RefuseException("evaluation-failed");
+				}
 			}
-		}
-	}
-	//Ответ на запрос о покупке
-	private class ReplyCFP extends CyclicBehaviour {
-		private MessageTemplate mt;
-		
-		@Override
-		public void action() {
-			mt=MessageTemplate.MatchPerformative(ACLMessage.CFP);
-			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
-				ACLMessage reply = msg.createReply();
-				reply.setPerformative(ACLMessage.PROPOSE);
-				reply.setContent(String.valueOf(price));
-				myAgent.send(reply);
+
+			@Override
+			protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose,ACLMessage accept) throws FailureException {
+				System.out.println("Agent "+getLocalName()+": Proposal accepted");
+				
+					System.out.println("Agent "+getLocalName()+": Action successfully performed");
+					ACLMessage inform = accept.createReply();
+					inform.setPerformative(ACLMessage.INFORM);
+					return inform;
+				
 			}
-			else {
-				block();
+
+			protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
+				System.out.println("Agent "+getLocalName()+": Proposal rejected");
 			}
-		}		
+		} );
 	}
 	
-	private class SendMsg extends OneShotBehaviour {
-		
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1049217622023441302L;
-		private Broker agent;
-		public SendMsg(Broker a) {
-			// TODO Auto-generated constructor stub
-			this.agent=a;
-			
-		}
-		
-		@Override
-		public void action() {
-			// TODO Auto-generated method stub
-			
-			ACLMessage request = new ACLMessage (ACLMessage.REQUEST);
-			request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-			request.addReceiver(new AID("ProducerAgent",AID.ISLOCALNAME));
-			request.setLanguage(new SLCodec().getName());	
-			request.setOntology(RequestOntology.getInstance().getName());
-			InformMessage imessage = new InformMessage();
-			imessage.setPrice(Integer.parseInt(price));
-			imessage.setVolume(Integer.parseInt(volume));
-			try {
-				this.agent.getContentManager().fillContent(request, imessage);
-			} catch (CodecException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OntologyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			this.agent.addBehaviour(new AchieveREInitiator(this.agent, request)
-			{			
-			/**
-				 * 
-				 */
-				private static final long serialVersionUID = -8866775600403413061L;
-
-				protected void handleInform(ACLMessage inform)
-				{	
-					
-				}
-			});
-		}
-	}
 }

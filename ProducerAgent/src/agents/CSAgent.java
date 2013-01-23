@@ -1,47 +1,59 @@
 package agents;
 
+
+import java.util.Vector;
+
+
+import Ontology.InformMessage;
+import Ontology.RequestOntology;
+import jade.content.lang.Codec.CodecException;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.OntologyException;
+import jade.content.onto.UngroundedException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREResponder;
+import jade.proto.SubscriptionResponder;
+import jade.proto.SubscriptionResponder.Subscription;
+import jade.proto.SubscriptionResponder.SubscriptionManager;
 
 public class CSAgent extends Agent {
-	
-/**
+	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4865824138314558688L;
-public String EValue;
-	
+	private static final long serialVersionUID = -2369928645280712754L;
+	public String EValue;
+	public Subscription sub;
+	private Vector<Subscription> subscribers = new Vector<Subscription>();
+	//Основной метод агента
 	protected void setup() {
-		// Printout a welcome message
-		System.out.println("Control System Agent "+getAID().getName()+" is ready.");
 		
+		CSAgentSubManager RTManager= new CSAgentSubManager(this);
+	  	MessageTemplate odrMT=MessageTemplate.and(SubscriptionResponder.createMessageTemplate(ACLMessage.SUBSCRIBE),MessageTemplate.MatchOntology(RequestOntology.getInstance().getName()));
+	  	SubscriptionResponder odrSubResponder = new SubscriptionResponder(this, odrMT, RTManager);
+	  	this.addBehaviour(odrSubResponder);
+		
+		
+		
+		
+		System.out.println("Control System Agent "+getAID().getName()+" is ready.");
+		this.getContentManager().registerLanguage(new SLCodec());
+		this.getContentManager().registerOntology(RequestOntology.getInstance());
+		this.createResponder();
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			EValue =  (String) args[0];
 			System.out.println("CSAgent: Energy Value "+EValue);
-		
-			addBehaviour(new TickerBehaviour(this, 15000) {
-				
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 56315723152540972L;
-
-				protected void onTick() {
-					System.out.println("CSAgent: Sending value to ProducerAgent "+EValue);
-					// Update the list of seller agents
-					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-					msg.addReceiver(new AID("ProducerAgent", AID.ISLOCALNAME));
-					
-					msg.setLanguage("English");
-					msg.setContent(EValue);
-					send(msg);
-					addBehaviour(new Receiver());
-				} 
-			} );
+			//Поведение для отправки объема энергии владельцу здания
+			
 		}
 		else {
 			// Make the agent terminate
@@ -49,26 +61,115 @@ public String EValue;
 			doDelete();
 		}
 		
+		
+		
+		
+		
 	}
 	
-	private class Receiver extends CyclicBehaviour {
+	private class CSAgentSubManager implements SubscriptionManager {
+		private CSAgent agent;
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 75873930823995368L;
+		public CSAgentSubManager(CSAgent agent) {
+			super();
+			this.agent = agent;
+		}
 
 		@Override
-		public void action() {
-			// TODO Auto-generated method stub
-			ACLMessage msg= myAgent.receive();
-			if (msg!=null) {
-				System.out.println("Mode was received, work mode is "+msg.getContent());
+		public boolean register(Subscription s) throws RefuseException,	NotUnderstoodException {
+			boolean result=false;
+			
+			if(s.getMessage().getContent().equalsIgnoreCase("Volume")){
+				agent.sub=s;
+				//System.out.println(controller.getLocalName()+": received subscription for "+s.getMessage().getContent()+" from "+s.getMessage().getSender().getLocalName());
+
+				//add behavior for sending one hour notifications
+				subscribers.add(sub);
+				agent.addBehaviour(new TickerBehaviour(agent,
+						10000) {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 3674681447400834233L;
+					@Override
+					protected void onTick() {
+
+						System.out.println("CSAgent: Sending value to ProducerAgent "+EValue);
+						// Update the list of seller agents
+						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+						msg.addReceiver(new AID("ProducerAgent", AID.ISLOCALNAME));
+						msg.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+						msg.setConversationId("Evalue");
+						msg.setLanguage(new SLCodec().getName());	
+						msg.setOntology(RequestOntology.getInstance().getName());
+						InformMessage imsg = new InformMessage();
+						imsg.setVolume(Integer.parseInt(EValue));
+						try {
+							((CSAgent)myAgent).getContentManager().fillContent(msg, imsg);
+						} catch (CodecException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (OntologyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						send(msg);
+						//addBehaviour(new Receiver());
+					
+						
+						
+					}
+				});
+
+				result=true;
+				this.confirm(sub);
+			}
+			return result;
+		}
+		
+		
+		
+		private void confirm(Subscription sub) 
+		{
+			try 
+			{
+				ACLMessage notification = sub.getMessage().createReply();
 				
-			}			
-			else {
-				block();
+				notification.setPerformative(ACLMessage.AGREE);
+				sub.notify(notification);												// Send message
+			
+				System.out.println("Agent sent AGREE message to the agent " + 
+								   sub.getMessage().getSender().getName());
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
 			}
 		}
+
+		@Override
+		public boolean deregister(Subscription s) throws FailureException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+	}
+	
+		
+	private void createResponder() {
+		MessageTemplate mtr = MessageTemplate.and(MessageTemplate.MatchSender(new AID("ProducerAgent", AID.ISLOCALNAME)), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));//AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		this.addBehaviour(new AchieveREResponder(this, mtr)
+						  {
+							private static final long serialVersionUID = 99691474816159152L;
+							private Broker agent;
+							protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+							   {
+								System.out.println("Mode was receiver. Workmode is: " + request.getContent());	
+								ACLMessage informDone = request.createReply(); 
+								informDone.setPerformative(ACLMessage.INFORM); 
+								informDone.setContent("inform done");
+								return informDone;
+							   }
+						  });
 	}
 }

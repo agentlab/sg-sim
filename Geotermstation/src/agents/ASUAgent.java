@@ -23,13 +23,13 @@ public class ASUAgent extends Agent {
 	 * 
 	 */
 	private Codec codec = new SLCodec(); 
-	private Ontology ontology = GeoTermTurbOntology.getInstance(); //создание экземпл€ров классов онтологии и €зыка
+	private Ontology ontology = GeoTermTurbOntology.getInstance(); //создани/е. экземпл€ров классов онтологии и €зыка
 	
 	private static final long serialVersionUID = 6615714058341878330L; 
 	public void setup() { 
 		System.out.println("ASUAgent.setup()");
 		
-		getContentManager().registerLanguage(codec); //регистраци€ €зыка и онтологии
+		getContentManager().registerLanguage(codec); //регистраци€. €зыка и онтологии
 		getContentManager().registerOntology(ontology);
 		
 		//конструктор сообщени€
