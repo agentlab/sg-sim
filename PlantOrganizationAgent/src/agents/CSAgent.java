@@ -11,10 +11,14 @@ import jade.core.AID;
 import jade.core.Agent;
 
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
@@ -49,7 +53,18 @@ public class CSAgent extends Agent {
 			EValue =  (String) args[0];
 			System.out.println("CSAgent: Energy Value "+EValue);
 			//Поведение для отправки объема энергии владельцу здания
-			
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.setName(getAID());
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("energy-sending");
+			sd.setName("ControlSystem");
+			dfd.addServices(sd);
+			try {
+				DFService.register(this, dfd);
+			}
+			catch (FIPAException fe) {
+				fe.printStackTrace();
+			}	
 		}
 		else {
 			// Make the agent terminate

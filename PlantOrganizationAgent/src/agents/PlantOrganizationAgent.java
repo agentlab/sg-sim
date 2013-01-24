@@ -16,6 +16,7 @@ import jade.content.onto.UngroundedException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -35,29 +36,66 @@ public class PlantOrganizationAgent extends Agent {
 private int nResponders;
 private String volume;
 private AID[] brokeragents;
-private PlantOrganizationAgent a;
+private AID[] csagents;
+public PlantOrganizationAgent a;
 public int rcnt=0;
 	protected void setup() {
-  	
+  	this.a=a;
   	
 		System.out.println("Plant Organization Agent "+getAID().getName()+" is ready.");
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(RequestOntology.getInstance());
-  		addBehaviour(new ReceiveFromCSAgent(this));
+		
+		addBehaviour(new SearchCS(this.a));
+		
+		addBehaviour(new ReceiveFromCSAgent(this));
 		
   	
-  		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
-		subscribe.setLanguage(new SLCodec().getName());
-		subscribe.setOntology(RequestOntology.getInstance().getName());
-		subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
-		subscribe.setContent("Volume");
-		subscribe.addReceiver((new AID("CSAgent", AID.ISLOCALNAME)));
-		this.addBehaviour(new PlantOrgAgentSubscrInit(this,subscribe));
+  		
   		
   		// Fill the CFP message
   		
   	
   }
+	
+	private class SearchCS extends OneShotBehaviour{
+		private PlantOrganizationAgent agent;
+		public SearchCS (PlantOrganizationAgent a){
+			this.agent=a;
+		}
+		@Override
+		public void action() {
+			// TODO Auto-generated method stub
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("energy-sending");
+			template.addServices(sd);
+			try {
+				DFAgentDescription[] result = DFService.search((PlantOrganizationAgent)myAgent, template); 
+				System.out.println("Found the following CS agents:");
+				csagents = new AID[result.length];
+				for (int i = 0; i < result.length; ++i) {
+					csagents[i] = result[i].getName();
+					System.out.println(csagents[i].getName());
+				}
+			}
+			catch (FIPAException fe) {
+				fe.printStackTrace();
+			}
+			ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
+			subscribe.setLanguage(new SLCodec().getName());
+			subscribe.setOntology(RequestOntology.getInstance().getName());
+			subscribe.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+			subscribe.setContent("Volume");
+			for (int i=0;i<csagents.length;++i){
+				subscribe.addReceiver(csagents[i]);
+			}
+			
+			myAgent.addBehaviour(new PlantOrgAgentSubscrInit(myAgent,subscribe));
+		}
+		
+	}
+	
 	private class PlantOrgAgentSubscrInit extends SubscriptionInitiator{
 
 		public PlantOrgAgentSubscrInit(Agent a, ACLMessage msg) {
@@ -150,6 +188,9 @@ public int rcnt=0;
 				catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
+				
+				
+				
 				
 				ACLMessage msg = new ACLMessage(ACLMessage.CFP);
 		  		for (int i = 0; i < brokeragents.length; ++i) {
@@ -268,7 +309,9 @@ public int rcnt=0;
 							ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
 							request.setContent("normal");
 							request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-							request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
+							for (int i=0;i<csagents.length;++i){
+								request.addReceiver(csagents[i]);
+							}
 							myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
 							protected void handleInform(ACLMessage inform) { 
 							System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "); 
