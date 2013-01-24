@@ -61,7 +61,7 @@ public class WindTurbineAgent extends Agent {
 
 			addBehaviour(dfSubscriptionResponder);
 
-			this.addBehaviour(new WindTurbineSubscriptionBehaviour(this, power, maxPower, subManager));
+			this.addBehaviour(new WindTurbineSubscriptionBehaviour(this, subManager));
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
 		}

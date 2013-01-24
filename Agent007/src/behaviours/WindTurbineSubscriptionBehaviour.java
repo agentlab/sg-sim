@@ -3,39 +3,38 @@ package behaviours;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import ontologies.*;
+import sg_sim.WindTurbineAgent;
 
 public class WindTurbineSubscriptionBehaviour extends TickerBehaviour {
 	private static final long serialVersionUID = 1L;
-	private int power;
-	private int maxPower;
 	private StateSubscriptionManager subManager;
+	WindTurbineAgent windTurbineAgent;
 
-	public WindTurbineSubscriptionBehaviour(Agent a, int power, int maxPower, StateSubscriptionManager subManager) {
+	public WindTurbineSubscriptionBehaviour(WindTurbineAgent a, StateSubscriptionManager subManager) {
 		super(a, 5000);
-		this.power = power;
-		this.maxPower = maxPower;
+		windTurbineAgent = a;
 		this.subManager=subManager;
 		this.subManager.setWindTurbine(this);
 	}
 
 	@Override
 	public void onTick() {
-		System.out.println("Power: " + this.power);		
-		System.out.println("Max power: " + this.maxPower);
+		System.out.println("Power: " + windTurbineAgent.getPower());		
+		System.out.println("Max power: " + windTurbineAgent.getMaxPower());
 	}
 
 	public State getState() {
 		State state = new State();
-		state.setPower(power);
-		state.setMaxPower(maxPower);
+		state.setPower(windTurbineAgent.getPower());
+		state.setMaxPower(windTurbineAgent.getMaxPower());
 		return state;
 	}
 
 	public double getPower() {
-		return power;
+		return windTurbineAgent.getPower();
 	}
 
 	public double getMaxPower() {
-		return maxPower;
+		return windTurbineAgent.getMaxPower();
 	}
 }

@@ -58,7 +58,7 @@ public class ProducerAgent extends Agent {
     	getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(ontology);  
 	  
-        ACLMessage powerRequest = createPowerRequest(100, 3000);
+        ACLMessage powerRequest = createPowerRequest(1, 3000);
     
         Behaviour b = new ProducerAgentRequestBehaviour(this, powerRequest);
         addBehaviour(b);

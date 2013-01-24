@@ -13,7 +13,6 @@ public class WindTurbineStateNotificationBehaviour extends TickerBehaviour {
 
 	public WindTurbineStateNotificationBehaviour(Agent a, StateSubscriptionManager subManager) {
 		super(a, 5000);
-
 		this.subManager = subManager;
 	}
 
