@@ -11,6 +11,6 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui&#13;&#10;test1:ru.bmstu.agents.BrokerAgent;ru.bmstu.agents.test"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui&#13;&#10;BrokerAgent:ru.bmstu.agents.BrokerAgent;Test:ru.bmstu.agents.test;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="AgentsSystems"/>
 </launchConfiguration>
