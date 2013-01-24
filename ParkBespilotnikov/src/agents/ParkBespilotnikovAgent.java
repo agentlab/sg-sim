@@ -297,23 +297,19 @@ import jade.proto.ContractNetInitiator;
 import jade.proto.SubscriptionInitiator;
 
 public class ParkBespilotnikovAgent extends Agent {
-/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 5238728634416626059L;
 private int nResponders;
 private String volume;
 private AID[] brokeragents;
 public int rcnt=0;
 	protected void setup() {
-  	
-  	
+
 		System.out.println("Парк беспилотников "+getAID().getLocalName()+" готов.");
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(RequestOntology.getInstance());
   		addBehaviour(new ReceiveFromCSAgent(this));
-		
-  	
+		  	
   		ACLMessage subscribe=new ACLMessage(ACLMessage.SUBSCRIBE);
 		subscribe.setLanguage(new SLCodec().getName());
 		subscribe.setOntology(RequestOntology.getInstance().getName());
@@ -325,9 +321,6 @@ public int rcnt=0;
   }
 	private class PBAgentSubscrInit extends SubscriptionInitiator{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		public PBAgentSubscrInit(Agent a, ACLMessage msg) {
 			super(a, msg);
@@ -341,9 +334,7 @@ public int rcnt=0;
 		}
 		@Override
 		protected void handleInform(ACLMessage msg) {
-			// TODO Auto-generated method stub
-			//mt=MessageTemplate.and(MessageTemplate.MatchSender(new AID("RetailBroker",AID.ISLOCALNAME)),MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-			
+
 			if (msg!=null){
 				
 			}			
@@ -407,7 +398,7 @@ public int rcnt=0;
 					msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
 					
 					//хотим получить ответ в течение 2 сек
-					msg.setReplyByDate(new Date(System.currentTimeMillis() + 2000));
+					msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 					
 					msg.setConversationId("price-request");
 					
@@ -437,36 +428,23 @@ public int rcnt=0;
 						protected void handleRefuse(ACLMessage refuse) {
 							
 							System.out.println("Парк не получил предложения от  "+refuse.getSender().getLocalName());
-							rcnt++;
-							if (rcnt==brokeragents.length){
-								ACLMessage csmsg=new ACLMessage(ACLMessage.INFORM);
-								csmsg.setContent("econom");
-								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
-								send(csmsg);
-								rcnt=0;
-							}
+							
 						}
 						
 						protected void handleFailure(ACLMessage failure) {
 							if (failure.getSender().equals(myAgent.getAMS())) {
-								// FAILURE notification from the JADE runtime: the receiver
-								// does not exist
+
 								System.out.println("Ответчик не обнаружен");
-								ACLMessage csmsg= new ACLMessage(ACLMessage.INFORM);
-								csmsg.addReceiver(new AID("CSAgent", AID.ISLOCALNAME));
-								csmsg.setContent("econom");
-								send(csmsg);
 							}
 							else {
 								System.out.println("Агент "+failure.getSender().getName()+" зафейлился");
 							}
-							// Immediate failure --> we will not receive a response from this agent
-							
+
 						}
 						
 						protected void handleAllResponses(Vector responses, Vector acceptances) {
 							if (responses.size() < brokeragents.length) {
-								// Some responder didn't reply within the specified timeout
+
 								System.out.println("Таймаут превышен  "+(nResponders - responses.size()));
 							}
 							// Evaluate proposals.
@@ -503,27 +481,14 @@ public int rcnt=0;
 									
 								}
 							}
-							// Accept the proposal of the best proposer
+
 							if (accept != null) {
 								System.out.println("Принимаем предложение по цене "+bestProposal+" от брокера "+bestProposer.getLocalName());
 								accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 							}						
 						}
 						
-						//protected void handleInform(ACLMessage inform) {
-						//	System.out.println("Агент "+inform.getSender().getLocalName()+" подтвердил продажу");
-								
-						//	ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-						//	request.setContent("normal");
-						//	request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-						//	request.addReceiver(new AID("CSAgent", AID.ISLOCALNAME)); 
-						//	myAgent.addBehaviour( new AchieveREInitiator(myAgent, request) { 
-						//	protected void handleInform(ACLMessage inform) { 
-							//System.out.println("Protocol finished. Rational Effect achieved. Received the following message: "); 
-						//	} }
-						//	);
-							
-						//}
+				
 					} );
 			}
 		}

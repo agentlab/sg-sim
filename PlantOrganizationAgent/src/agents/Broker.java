@@ -1,7 +1,5 @@
 package agents;
 
-import java.util.Random;
-
 import Ontology.InformMessage;
 import Ontology.RequestOntology;
 import jade.content.lang.Codec.CodecException;
@@ -22,15 +20,22 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
 
 public class Broker extends Agent {
-
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 7779532957753246851L;
 	public String price;
 	public String volume;
 	public String Evalue;
 	protected void setup() {
-
+		System.out.println("Agent "+getLocalName()+" waiting for CFP...");
 		this.getContentManager().registerLanguage(new SLCodec());
 		this.getContentManager().registerOntology(RequestOntology.getInstance());
+		
+		Object[] args = getArguments();
+		if (args != null && args.length > 0) {
+			price =  (String) args[0];
+			volume=  (String) args[1];
 			
 			DFAgentDescription dfd = new DFAgentDescription();
 			dfd.setName(getAID());
@@ -44,19 +49,28 @@ public class Broker extends Agent {
 			catch (FIPAException fe) {
 				fe.printStackTrace();
 			}			
-		
+		}
+		else{
+			System.out.println(getAID().getName()+" No available arguments");
+			doDelete();
+		}
 		
 		MessageTemplate template = MessageTemplate.and(
 				MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
 				MessageTemplate.MatchPerformative(ACLMessage.CFP) );
 
 		addBehaviour(new ContractNetResponder(this, template) {
+			/**
+			 * 
+			 */
 			private static final long serialVersionUID = -8436872907122692247L;
+			//private Broker agent=(Broker)myAgent;
 			
 			
 			@Override
 			protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
 				InformMessage a;
+				System.out.println("Agent "+getLocalName()+": CFP received from "+cfp.getSender().getName()+". Action is "+cfp.getConversationId());
 				try {
 					a = (InformMessage)getContentManager().extractContent(cfp);
 					Evalue=String.valueOf(a.getVolume());
@@ -70,18 +84,12 @@ public class Broker extends Agent {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				Random generator = new Random();
-				price = Integer.toString(generator.nextInt(100)+50);
-				volume = Integer.toString(generator.nextInt(250)+50);
+				
 				if (Integer.parseInt(Evalue)<Integer.parseInt(volume)) {
-					
-					
-					
-					System.out.println("Агент "+getLocalName()+" предлагает по цене "+price);
+					// We provide a proposal
+					System.out.println("Agent "+getLocalName()+": Proposing "+price);
 					ACLMessage propose = cfp.createReply();
 					propose.setOntology(RequestOntology.getInstance().getName());
-					
-					
 					InformMessage imessage = new InformMessage();
 					imessage.setPrice(Integer.parseInt(price));
 					imessage.setVolume(Integer.parseInt(volume));
@@ -101,15 +109,16 @@ public class Broker extends Agent {
 				}
 				else {
 					// We refuse to provide a proposal
-					System.out.println("Агент "+getLocalName()+" не выслал предложения");
+					System.out.println("Agent "+getLocalName()+": Refuse");
 					throw new RefuseException("evaluation-failed");
 				}
 			}
 
 			@Override
 			protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose,ACLMessage accept) throws FailureException {
+				System.out.println("Agent "+getLocalName()+": Proposal accepted");
 				
-					System.out.println("Агент "+getLocalName()+": Предложение принято");
+					System.out.println("Agent "+getLocalName()+": Action successfully performed");
 					ACLMessage inform = accept.createReply();
 					inform.setPerformative(ACLMessage.INFORM);
 					return inform;
@@ -117,7 +126,7 @@ public class Broker extends Agent {
 			}
 
 			protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-				System.out.println("Agent "+getLocalName()+": Предложение не принято");
+				System.out.println("Agent "+getLocalName()+": Proposal rejected");
 			}
 		} );
 	}
