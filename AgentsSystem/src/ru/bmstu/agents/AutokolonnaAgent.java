@@ -24,13 +24,13 @@ import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.AMSService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-public class BabushkaAgent extends Agent {
+public class AutokolonnaAgent extends Agent {
 private static final Logger logger = Logger.getLogger(BabushkaAgent.class);
 private static final long serialVersionUID = 3663966406239393054L;
 private Codec codec = new SLCodec();
@@ -40,18 +40,18 @@ private Ontology ontology = EnergyOntology.getInstance();
 void sendMessage(Agent myAgent,int performative, AgentAction action, AID server,ACLMessage _msg) 
 {
 	
-	AMSAgentDescription[] agents = null;
+	DFAgentDescription[] agents = null;
 	AID agentID=null;
 	try {
 		SearchConstraints c = new SearchConstraints();
 		c.setMaxResults(new Long(-1));
-		agents = AMSService.search(myAgent, new AMSAgentDescription(), c);
+		agents = DFService.search(myAgent, new DFAgentDescription(), c);
 	} catch (Exception e) {
 		System.out.println("Problem searching AMS: " + e);
 		e.printStackTrace();
 	}
-	for (AMSAgentDescription agent : agents) {
-		if(agent.getName().getLocalName().equals("babushka"))
+	for (DFAgentDescription agent : agents) {
+		if(agent.getName().getLocalName().equals("autokolonna"))
 		{
 			agentID = agent.getName();
 		}
@@ -64,7 +64,7 @@ void sendMessage(Agent myAgent,int performative, AgentAction action, AID server,
 	msg.setPerformative(performative);
 	msg.setLanguage(codec.getName());
 	msg.setOntology(ontology.getName());
-	msg.setConversationId("Babushka");
+	msg.setConversationId("Autokolonna");
 	 try {
 		 if(server!=null)
 		 {	
@@ -88,6 +88,8 @@ protected void setup()  {
     // Register language and ontology
     getContentManager().registerLanguage(codec);
     getContentManager().registerOntology(ontology);
+    
+    
 
 	
 addBehaviour(new CyclicBehaviour(this) {
@@ -103,7 +105,7 @@ public void action()  {
 	
 	if(canSetNewTime)
 	{
-		lastTime=System.currentTimeMillis()+test.BabushkaBuyElectricity;
+		lastTime=System.currentTimeMillis()+test.AutokolonnaBuyElectricity;
 		canSetNewTime=false;
 	}
 
@@ -119,25 +121,20 @@ public void action()  {
 	
 	if(energy.getQuantity()==0&&!messageForBuyIsSend)
 	{
-		AMSAgentDescription[] agents = null;
+		DFAgentDescription[] agents = null;
 		try {
 			SearchConstraints c = new SearchConstraints();
 			c.setMaxResults(new Long(-1));
-			agents = AMSService.search(this.myAgent, new AMSAgentDescription(), c);
+			agents = DFService.search(this.myAgent, new DFAgentDescription(), c);
 		} catch (Exception e) {
 			System.out.println("Problem searching AMS: " + e);
 			e.printStackTrace();
 		}
-		for (AMSAgentDescription agent : agents) {
-			if(agent.getName().getLocalName().equals("broker"))
+		for (DFAgentDescription agent : agents) {
+			if(agent.getName().getLocalName().equals("BrokerAgent"))
 			{
 				AID agentID = agent.getName();
-				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-				msg.setConversationId("Babushka");
-				msg.addReceiver(agentID);// id агента которому отправляем сообщение
-				
-				//новое
-				
+
 				Energy mo = new Energy();
 				Random r = new Random();
 				int needToBuy =50+ r.nextInt(50);
@@ -147,20 +144,12 @@ public void action()  {
 				 messageForBuyIsSend=true;
 				//новое
 				
-				/** старое без онтологий
-				msg.setLanguage("English");// Язык сообщения
-				Random r = new Random();
-				int needToBuy =50+ r.nextInt(50);
-				msg.setContent(String.valueOf(needToBuy));
-				send(msg); // отправляем сообщение
-				messageForBuyIsSend=true;
-				**/
 
 			}
 		}
 	}
 	
-	MessageTemplate mt =MessageTemplate.MatchConversationId("Babushka");
+	MessageTemplate mt =MessageTemplate.MatchConversationId("Autokolonna");
 		ACLMessage msg = myAgent.receive(mt);
 		if (msg != null) {
 			System.out.println("prishlo");
@@ -177,8 +166,8 @@ public void action()  {
 							quantity=mo.getQuantity();
 							money=money-mo.getPrice();
 							energy.setQuantity(mo.getQuantity());
-							System.out.println("energy of Babushka= "+energy.getQuantity());
-							System.out.println("money of babushka = "+money);
+							System.out.println("energy of Autokolonna= "+energy.getQuantity());
+							System.out.println("money of Autokolonna = "+money);
 						} catch (UngroundedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

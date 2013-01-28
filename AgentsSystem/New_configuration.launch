@@ -11,6 +11,6 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui broker:ru.bmstu.agents.BrokerAgent(heromotaaa);babushka:ru.bmstu.agents.BabushkaAgent;driver:ru.bmstu.agents.DriverAgent;autokolonna:ru.bmstu.agents.AutokolonnaAgent"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui BrokerAgent:ru.bmstu.agents.BrokerAgent(heromotaaa);babushka:ru.bmstu.agents.BabushkaAgent;driver:ru.bmstu.agents.DriverAgent;autokolonna:ru.bmstu.agents.AutokolonnaAgent"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="AgentsSystems"/>
 </launchConfiguration>
