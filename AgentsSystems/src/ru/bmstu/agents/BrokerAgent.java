@@ -58,7 +58,7 @@ public class BrokerAgent extends Agent {
 			e.printStackTrace();
 		}
 		for (DFAgentDescription agent : agents) {
-			if(agent.getName().getLocalName().equals("babushka"))
+			//if(agent.getName().getLocalName().equals("babushka"))
 			{
 				agentID = agent.getName();
 			}
@@ -166,7 +166,7 @@ public class BrokerAgent extends Agent {
 				          System.out.println("neeeeeed quaaa"+mo.getNeedToBuy());
 					}
 				}
-				*/
+				
 				
 				
 				ToSendObject toSend=broker.messageListener(myAgent, energy, money, "Babushka");
