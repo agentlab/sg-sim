@@ -165,7 +165,7 @@ public class BrokerAgent extends Agent {
 				          Energy mo = (Energy)((Action)content).getAction();
 				          System.out.println("neeeeeed quaaa"+mo.getNeedToBuy());
 					}
-				}
+				}*/
 				
 				
 				
