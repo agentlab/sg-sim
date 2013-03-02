@@ -1,0 +1,2 @@
+-gui
+BuildingCS:agents.BuildingCSAgent;Consumer1:agents.CustomerAgent;Consumer2:agents.CustomerAgent;BuildingOwner:agents.BOAgent
