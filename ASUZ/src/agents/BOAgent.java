@@ -49,27 +49,12 @@ public class BOAgent extends Agent
 		System.out.println("Agent " + this.getLocalName() + " is shutting down.");
 	}
 	
-	public SendSubscriptionMessage getNotifyMessage(Subscriber subscriber)
-	{
-		SubscriptionMessage msg = new SubscriptionMessage();
-		msg.setSendDate(new Date()); 											// Sending date	
-		msg.setType(subscriber.getType());
-		switch (subscriber.getType())
-		{		
-			case PowerConsumption:
-				msg.setValue(this.getPowerConsumption());
-				break;
-				
-			default:
-				break;
-		}
-		SendSubscriptionMessage smsg = new SendSubscriptionMessage();
-		smsg.setMessage(msg);
+
 		
-		return smsg;
-	}
+		
+
 	
-	private double getPowerConsumption()
+	public double getPowerConsumption()
 	{
 		return this.consumption;
 	}

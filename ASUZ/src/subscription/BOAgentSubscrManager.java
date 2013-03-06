@@ -32,6 +32,27 @@ public class BOAgentSubscrManager implements SubscriptionManager
 	{
 		this.owner = c;
 	}
+	
+	public SendSubscriptionMessage getNotifyMessage(Subscriber subscriber)
+	{
+		
+		
+//		switch (subscriber.getType())
+//		{		
+//			case PowerConsumption:
+				SubscriptionMessage msg = new SubscriptionMessage();
+				msg.setType(subscriber.getType());
+				msg.setSendDate(new Date()); 											// Sending date	
+				msg.setValue(this.owner.getPowerConsumption());
+				SendSubscriptionMessage smsg = new SendSubscriptionMessage();
+				smsg.setMessage(msg);
+//				break;
+				
+//			default:
+//				break;
+//		}
+		return smsg;
+	}
 
 	/**
 	 * Subscriber register
@@ -134,19 +155,31 @@ public class BOAgentSubscrManager implements SubscriptionManager
 	{
 		try 
 		{
+			switch (subscriber.getType())
+			{		
+				case PowerConsumption:
+			
 			Subscription subscription = subscriber.getSub();
 			ACLMessage notification = subscription.getMessage().createReply();
 			notification.setPerformative(ACLMessage.INFORM); 					// New message 			
 			// Create context		
-			SendSubscriptionMessage smsg = this.owner.getNotifyMessage(subscriber);
+			SendSubscriptionMessage smsg = this.getNotifyMessage(subscriber);
 			this.owner.getContentManager().fillContent(notification, smsg);
-			subscription.notify(notification); 												// Send message		
+			subscription.notify(notification); 												// Send message
+			
+			break;
+			
+		default:
+			break;
+	}
 		} 
 		catch (Exception e) 
 		{
 			e.printStackTrace();
 		} 
 	}
+	
+	
 
 	/**
 	 * Agree to subscribe 
